@@ -1,0 +1,74 @@
+## Build results
+bin/
+obj/
+[Bb]in/
+[Oo]bj/
+./../obj
+
+## User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Visual Studio
+.vs/
+.vscode/
+
+## Rider / JetBrains
+.idea/
+*.sln.iml
+
+## Logs
+*.log
+
+## Build artifacts
+*.dll
+*.exe
+*.pdb
+*.cache
+*.lib
+*.exp
+
+## NuGet
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+!**/packages/repositories.config
+*.nuget.props
+*.nuget.targets
+project.lock.json
+project.assets.json
+
+## Dotnet publish output
+publish/
+*.publish.xml
+
+## ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+## Entity Framework
+Migrations/*Designer.cs
+Migrations/*_Migration.cs
+*.db
+*.db-shm
+*.db-wal
+
+## Test results
+TestResults/
+*.coverage
+*.coveragexml
+
+## Docker
+**/docker-compose.override.yml
+
+## OS files
+.DS_Store
+Thumbs.db
+
+## Secrets
+appsettings.Development.json
+secrets.json
+*.key
+*.pem
