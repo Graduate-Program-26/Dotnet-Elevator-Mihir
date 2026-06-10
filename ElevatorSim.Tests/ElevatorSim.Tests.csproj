@@ -18,4 +18,9 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ElevatorSim.Domain\ElevatorSim.Domain.csproj" />
+    <ProjectReference Include="..\ElevatorSim.Application\ElevatorSim.Application.csproj" />
+  </ItemGroup>
+
 </Project>
