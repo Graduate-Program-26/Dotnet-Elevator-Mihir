@@ -81,4 +81,19 @@ public class ApplicationLayerTests
         [new FreightElevator()],
         [new HighSpeedElevator()]
     ];
+
+    [Fact]
+    public void SelectElevator_ReturnsNearestAvailableElevator()
+    {
+        var elevatorOnFloor2 = new PassengerElevator(startFloor: 2);
+        var elevatorOnFloor8 = new PassengerElevator(startFloor: 8);
+        var strategy = new NearestAvailableDispatchStrategy();
+
+        var selected = strategy.SelectElevator(
+            [elevatorOnFloor2, elevatorOnFloor8],
+            requestedFloor: 3,
+            passengerCount: 1);
+
+        Assert.Equal(elevatorOnFloor2, selected);
+    }
 }
