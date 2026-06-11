@@ -113,4 +113,21 @@ public class ApplicationLayerTests
 
         Assert.Equal(availableElevator, selected);
     }
+
+    [Fact]
+    public void SelectElevator_SkipsElevatorWithDoorsOpen()
+    {
+        var doorsOpenElevator = new PassengerElevator(capacity: 10, startFloor: 1);
+        doorsOpenElevator.OpenDoors();
+
+        var availableElevator = new PassengerElevator(capacity: 10, startFloor: 8);
+        var strategy = new NearestAvailableDispatchStrategy();
+
+        var selected = strategy.SelectElevator(
+            [doorsOpenElevator, availableElevator],
+            requestedFloor: 1,
+            passengerCount: 1);
+
+        Assert.Equal(availableElevator, selected);
+    }
 }
