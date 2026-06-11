@@ -1,9 +1,9 @@
 public class ElevatorBase : IElevator
 {
-    private int _currentFloor { get; set; }
-    private ElevatorDirection _direction { get; set; }
-    private ElevatorState _state { get; set; }
-    private int _passengerCount { get; set; }
+    private int _currentFloor;
+    private ElevatorDirection _direction;
+    private ElevatorState _state;
+    private int _passengerCount;
 
     public int CurrentFloor => _currentFloor;
     public ElevatorDirection Direction => _direction;
