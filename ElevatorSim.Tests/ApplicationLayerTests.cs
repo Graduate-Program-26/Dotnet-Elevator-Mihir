@@ -96,4 +96,21 @@ public class ApplicationLayerTests
 
         Assert.Equal(elevatorOnFloor2, selected);
     }
+
+    [Fact]
+    public void SelectElevator_SkipsElevatorAtCapacity()
+    {
+        var fullElevator = new PassengerElevator(capacity: 2, startFloor: 1);
+        fullElevator.AddPassengers(2);
+
+        var availableElevator = new PassengerElevator(capacity: 10, startFloor: 8);
+        var strategy = new NearestAvailableDispatchStrategy();
+
+        var selected = strategy.SelectElevator(
+            [fullElevator, availableElevator],
+            requestedFloor: 1,
+            passengerCount: 1);
+
+        Assert.Equal(availableElevator, selected);
+    }
 }
