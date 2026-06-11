@@ -1,4 +1,6 @@
-﻿using Timer = System.Timers.Timer;
+﻿using Moq;
+
+using Timer = System.Timers.Timer;
 
 namespace ElevatorSim.Tests;
 
