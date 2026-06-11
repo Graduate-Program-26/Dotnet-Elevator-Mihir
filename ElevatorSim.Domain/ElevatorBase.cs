@@ -44,7 +44,7 @@ public class ElevatorBase : IElevator
     {
         if (_passengerCount + count > Capacity)
         {
-            // @TODO: throw custome exception for capacity being exceeded
+            throw new CapacityExceededException(Capacity);
         }
 
         _passengerCount += count;
