@@ -29,4 +29,18 @@ public class DomainUnitTests
         mockStrategy.Verify(s => s.SelectElevator(
             It.IsAny<IEnumerable<IElevator>>(), 5, 2), Times.Once);
     }
+
+    [Fact]
+    public void GetStatuses_ReturnsStatusForAllElevators()
+    {
+        var elevator = new PassengerElevator(capacity: 10, startFloor: 1);
+        var controller = new ElevatorController([elevator]);
+
+        var statuses = controller.GetStatuses();
+
+        Assert.Single(statuses);
+        Assert.Equal(1, statuses.First().CurrentFloor);
+        Assert.Equal(ElevatorDirection.Stationary, statuses.First().Direction);
+        Assert.Equal(ElevatorState.Idle, statuses.First().State);
+    }
 }
