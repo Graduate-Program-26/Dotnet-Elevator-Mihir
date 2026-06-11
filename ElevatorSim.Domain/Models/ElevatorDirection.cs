@@ -1,0 +1,1 @@
+public enum ElevatorDirection { Stationary, Up, Down }
