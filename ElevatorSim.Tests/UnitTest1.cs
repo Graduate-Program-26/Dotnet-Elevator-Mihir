@@ -17,4 +17,16 @@ public class DomainUnitTests
         elevator.MoveToFloor(3);
         Assert.Equal(ElevatorDirection.Down, elevator.Direction);
     }
+
+    [Fact]
+    public void RequestElevator_UsesDispatchStrategy_ToSelectElevator()
+    {
+        var mockStrategy = new Mock<IDispatchStrategy>();
+        var controller = new ElevatorController(elevators, mockStrategy.Object);
+
+        controller.RequestElevator(5, 2);
+
+        mockStrategy.Verify(s => s.SelectElevator(
+            It.IsAny<IEnumerable<IElevator>>(), 5, 2), Times.Once);
+    }
 }
