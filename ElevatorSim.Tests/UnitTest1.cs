@@ -9,4 +9,13 @@ public class DomainUnitTests
         elevator.MoveToFloor(5);
         Assert.Equal(ElevatorDirection.Up, elevator.Direction);
     }
+
+    [Fact]
+    public void MoveToFloor_SetsDirectionDown_WhenTargetIsLower()
+    {
+        var elevator = new PassengerElevator(capacity: 10, startFloor: 8);
+        elevator.MoveToFloor(3);
+
+        Assert.Equal(ElevatorDirection.Down, elevator.Direction);
+    }
 }
