@@ -56,4 +56,29 @@ public class ApplicationLayerTests
 
         Assert.Equal(5, elevator.CurrentFloor);
     }
+
+    [Theory]
+    [MemberData(nameof(AllElevatorTypes))]
+    public void AllElevatorTypes_MoveToFloor_UpdatesCurrentFloor(IElevator elevator)
+    {
+        elevator.MoveToFloor(7);
+
+        Assert.Equal(7, elevator.CurrentFloor);
+    }
+
+    [Theory]
+    [MemberData(nameof(AllElevatorTypes))]
+    public void AllElevatorTypes_AddPassengers_IncreasesPassengerCount(IElevator elevator)
+    {
+        elevator.AddPassengers(1);
+
+        Assert.Equal(1, elevator.PassengerCount);
+    }
+
+    public static IEnumerable<object[]> AllElevatorTypes =>
+    [
+        [new PassengerElevator()],
+        [new FreightElevator()],
+        [new HighSpeedElevator()]
+    ];
 }
