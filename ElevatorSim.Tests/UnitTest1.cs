@@ -15,7 +15,6 @@ public class DomainUnitTests
     {
         var elevator = new PassengerElevator(capacity: 10, startFloor: 8);
         elevator.MoveToFloor(3);
-
         Assert.Equal(ElevatorDirection.Down, elevator.Direction);
     }
 }
