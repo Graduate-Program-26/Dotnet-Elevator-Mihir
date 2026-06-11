@@ -1,3 +1,5 @@
+using Moq;
+
 namespace ElevatorSim.Tests;
 
 public class ApplicationLayerTests
@@ -172,5 +174,132 @@ public class ApplicationLayerTests
             passengerCount: 1);
 
         Assert.NotNull(selected);
+    }
+
+    [Fact]
+    public void GetStatuses_ReturnsStatusForAllElevators()
+    {
+        var elevator = new PassengerElevator(capacity: 10, startFloor: 1);
+        var mockStrategy = new Mock<IDispatchStrategy>();
+        var controller = new ElevatorController([elevator], mockStrategy.Object);
+
+        var statuses = controller.GetStatuses();
+
+        Assert.Single(statuses);
+        Assert.Equal(1, statuses.First().CurrentFloor);
+        Assert.Equal(ElevatorDirection.Stationary, statuses.First().Direction);
+        Assert.Equal(ElevatorState.Idle, statuses.First().State);
+        Assert.Equal(0, statuses.First().PassengerCount);
+    }
+
+    [Fact]
+    public async Task RequestElevator_ThrowsInvalidFloorException_WhenFloorBelowMinimum()
+    {
+        var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object);
+
+        await Assert.ThrowsAsync<InvalidFloorException>(
+            () => controller.RequestElevator(0, 1));
+    }
+
+    [Fact]
+    public async Task RequestElevator_ThrowsInvalidFloorException_WhenFloorAboveMaximum()
+    {
+        var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object);
+
+        await Assert.ThrowsAsync<InvalidFloorException>(
+            () => controller.RequestElevator(99, 1));
+    }
+
+    [Fact]
+    public async Task RequestElevator_ThrowsArgumentException_WhenPassengerCountIsZero()
+    {
+        var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object);
+
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
+            () => controller.RequestElevator(5, 0));
+    }
+
+    [Fact]
+    public async Task RequestElevator_ThrowsArgumentException_WhenPassengerCountIsNegative()
+    {
+        var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object);
+
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
+            () => controller.RequestElevator(5, -1));
+    }
+
+    [Fact]
+    public void RequestElevator_DispatchesElevatorToRequestedFloor()
+    {
+        var mockElevator = new Mock<IElevator>();
+        mockElevator.Setup(e => e.CanAcceptPassengers).Returns(true);
+        mockElevator.Setup(e => e.State).Returns(ElevatorState.Idle);
+        mockElevator.Setup(e => e.Capacity).Returns(10);
+        mockElevator.Setup(e => e.PassengerCount).Returns(0);
+
+        var mockStrategy = new Mock<IDispatchStrategy>();
+        mockStrategy
+            .Setup(s => s.SelectElevator(
+                It.IsAny<IEnumerable<IElevator>>(), 5, 2))
+            .Returns(mockElevator.Object);
+
+        var controller = new ElevatorController([mockElevator.Object], mockStrategy.Object);
+
+        controller.RequestElevator(5, 2);
+
+        mockElevator.Verify(e => e.MoveToFloor(5), Times.Once);
+        mockElevator.Verify(e => e.AddPassengers(2), Times.Once);
+    }
+
+    [Fact]
+    public void RequestElevator_QueuesRequest_WhenNoElevatorAvailable()
+    {
+        var mockStrategy = new Mock<IDispatchStrategy>();
+        mockStrategy
+            .Setup(s => s.SelectElevator(
+                It.IsAny<IEnumerable<IElevator>>(),
+                It.IsAny<int>(),
+                It.IsAny<int>()))
+            .Returns((IElevator?)null);
+
+        var controller = new ElevatorController([], mockStrategy.Object);
+
+        controller.RequestElevator(5, 2);
+
+        Assert.Equal(1, controller.PendingRequestCount);
+    }
+
+    [Fact]
+    public void RequestElevator_DispatchesSecondElevator_WhenFirstCannotFitAllPassengers()
+    {
+        var firstElevator = new Mock<IElevator>();
+        firstElevator.Setup(e => e.Capacity).Returns(10);
+        firstElevator.Setup(e => e.PassengerCount).Returns(8);
+        firstElevator.Setup(e => e.CanAcceptPassengers).Returns(true);
+        firstElevator.Setup(e => e.State).Returns(ElevatorState.Idle);
+
+        var secondElevator = new Mock<IElevator>();
+        secondElevator.Setup(e => e.Capacity).Returns(10);
+        secondElevator.Setup(e => e.PassengerCount).Returns(0);
+        secondElevator.Setup(e => e.CanAcceptPassengers).Returns(true);
+        secondElevator.Setup(e => e.State).Returns(ElevatorState.Idle);
+
+        var mockStrategy = new Mock<IDispatchStrategy>();
+        mockStrategy
+            .SetupSequence(s => s.SelectElevator(
+                It.IsAny<IEnumerable<IElevator>>(),
+                It.IsAny<int>(),
+                It.IsAny<int>()))
+            .Returns(firstElevator.Object)
+            .Returns(secondElevator.Object);
+
+        var controller = new ElevatorController(
+            [firstElevator.Object, secondElevator.Object],
+            mockStrategy.Object);
+
+        controller.RequestElevator(5, 5);
+
+        firstElevator.Verify(e => e.AddPassengers(2), Times.Once);
+        secondElevator.Verify(e => e.AddPassengers(3), Times.Once);
     }
 }
