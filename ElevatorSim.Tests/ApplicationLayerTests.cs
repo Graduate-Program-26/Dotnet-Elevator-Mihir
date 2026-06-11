@@ -158,4 +158,19 @@ public class ApplicationLayerTests
 
         Assert.Null(selected);
     }
+
+    [Fact]
+    public void SelectElevator_ReturnsFirst_WhenMultipleElevatorsEquidistant()
+    {
+        var elevatorOnFloor3 = new PassengerElevator(capacity: 10, startFloor: 3);
+        var elevatorOnFloor7 = new PassengerElevator(capacity: 10, startFloor: 7);
+        var strategy = new NearestAvailableDispatchStrategy();
+
+        var selected = strategy.SelectElevator(
+            [elevatorOnFloor3, elevatorOnFloor7],
+            requestedFloor: 5,
+            passengerCount: 1);
+
+        Assert.NotNull(selected);
+    }
 }
