@@ -130,4 +130,32 @@ public class ApplicationLayerTests
 
         Assert.Equal(availableElevator, selected);
     }
+
+    [Fact]
+    public void SelectElevator_ReturnsNull_WhenNoElevatorsAvailable()
+    {
+        var strategy = new NearestAvailableDispatchStrategy();
+
+        var selected = strategy.SelectElevator(
+            [],
+            requestedFloor: 5,
+            passengerCount: 1);
+
+        Assert.Null(selected);
+    }
+
+    [Fact]
+    public void SelectElevator_ReturnsNull_WhenAllElevatorsAtCapacity()
+    {
+        var fullElevator = new PassengerElevator(capacity: 2, startFloor: 1);
+        fullElevator.AddPassengers(2);
+        var strategy = new NearestAvailableDispatchStrategy();
+
+        var selected = strategy.SelectElevator(
+            [fullElevator],
+            requestedFloor: 5,
+            passengerCount: 1);
+
+        Assert.Null(selected);
+    }
 }
