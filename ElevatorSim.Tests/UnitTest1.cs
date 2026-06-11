@@ -1,4 +1,6 @@
-﻿namespace ElevatorSim.Tests;
+﻿using Timer = System.Timers.Timer;
+
+namespace ElevatorSim.Tests;
 
 public class DomainUnitTests
 {
@@ -27,7 +29,7 @@ public class DomainUnitTests
         controller.RequestElevator(5, 2);
 
         mockStrategy.Verify(s => s.SelectElevator(
-            It.IsAny<IEnumerable<IElevator>>(), 5, 2), Times.Once);
+            It.IsAny<IEnumerable<IElevator>>(), 5, 2), Timer.Once);
     }
 
     [Fact]
