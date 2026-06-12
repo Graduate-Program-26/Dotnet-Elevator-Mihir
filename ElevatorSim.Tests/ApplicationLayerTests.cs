@@ -193,38 +193,38 @@ public class ApplicationLayerTests
     }
 
     [Fact]
-    public async Task RequestElevator_ThrowsInvalidFloorException_WhenFloorBelowMinimum()
+    public void RequestElevator_ThrowsInvalidFloorException_WhenFloorBelowMinimum()
     {
         var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object);
 
-        await Assert.ThrowsAsync<InvalidFloorException>(
+        Assert.Throws<InvalidFloorException>(
             () => controller.RequestElevator(0, 1));
     }
 
     [Fact]
-    public async Task RequestElevator_ThrowsInvalidFloorException_WhenFloorAboveMaximum()
+    public void RequestElevator_ThrowsInvalidFloorException_WhenFloorAboveMaximum()
     {
         var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object);
 
-        await Assert.ThrowsAsync<InvalidFloorException>(
+        Assert.Throws<InvalidFloorException>(
             () => controller.RequestElevator(99, 1));
     }
 
     [Fact]
-    public async Task RequestElevator_ThrowsArgumentException_WhenPassengerCountIsZero()
+    public void RequestElevator_ThrowsArgumentException_WhenPassengerCountIsZero()
     {
         var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object);
 
-        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
+        Assert.Throws<ArgumentOutOfRangeException>(
             () => controller.RequestElevator(5, 0));
     }
 
     [Fact]
-    public async Task RequestElevator_ThrowsArgumentException_WhenPassengerCountIsNegative()
+    public void RequestElevator_ThrowsArgumentException_WhenPassengerCountIsNegative()
     {
         var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object);
 
-        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
+        Assert.Throws<ArgumentOutOfRangeException>(
             () => controller.RequestElevator(5, -1));
     }
 
