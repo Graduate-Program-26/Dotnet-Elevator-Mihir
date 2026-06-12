@@ -59,4 +59,9 @@ public class ElevatorBase : IElevator
 
         _passengerCount -= count;
     }
+
+    public void OpenDoors()
+    {
+        _state = ElevatorState.DoorsOpen;
+    }
 }
