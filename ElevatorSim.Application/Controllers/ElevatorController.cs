@@ -1,20 +1,14 @@
-public class ElevatorController : IElevatorController
+public class ElevatorController(
+    IEnumerable<IElevator> elevators,
+    IDispatchStrategy dispatchStrategy) : IElevatorController
 {
-    private readonly IEnumerable<IElevator> _elevators;
-    private readonly IDispatchStrategy _dispatchStrategy;
+    private readonly IEnumerable<IElevator> _elevators = elevators;
+    private readonly IDispatchStrategy _dispatchStrategy = dispatchStrategy;
     private readonly PassengerQueue _pendingRequests = new();
 
     public const int MinFloor = 1;
     public const int MaxFloor = 20;
     public int PendingRequestCount => _pendingRequests.Count;
-
-    public ElevatorController(
-        IEnumerable<IElevator> elevators,
-        IDispatchStrategy dispatchStrategy)
-    {
-        _elevators = elevators;
-        _dispatchStrategy = dispatchStrategy;
-    }
 
     public IEnumerable<ElevatorStatus> GetStatuses()
     {
