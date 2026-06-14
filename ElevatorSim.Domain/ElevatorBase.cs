@@ -4,6 +4,7 @@ public class ElevatorBase : IElevator
     private ElevatorDirection _direction;
     private ElevatorState _state;
     private int _passengerCount;
+    private readonly List<Passenger> _passengers = [];
 
     public int CurrentFloor => _currentFloor;
     public ElevatorDirection Direction => _direction;
@@ -11,6 +12,10 @@ public class ElevatorBase : IElevator
     public int PassengerCount => _passengerCount;
     public bool CanAcceptPassengers => _passengerCount < Capacity;
     public int Capacity { get; }
+    public IReadOnlyList<int> DestinationFloors =>
+        _passengers
+            .Select(p => p.DestinationFloor)
+            .ToList();
 
     protected ElevatorBase(int capacity, int startFloor = 1)
     {
@@ -63,5 +68,16 @@ public class ElevatorBase : IElevator
     public void OpenDoors()
     {
         _state = ElevatorState.DoorsOpen;
+    }
+
+    public void BoardPassenger(Passenger passenger)
+    {
+        if (_passengers.Count >= Capacity)
+        {
+            throw new CapacityExceededException(Capacity);
+        }
+
+        _passengers.Add(passenger);
+        _passengerCount = _passengers.Count;
     }
 }
