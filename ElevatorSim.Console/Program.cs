@@ -17,24 +17,47 @@ var services = new ServiceCollection()
             .CreateLogger());
     })
     .AddElevatorSimulation(config)
+    .AddSingleton<IConsoleRenderer, ConsoleRenderer>()
     .BuildServiceProvider();
 
 var controller = services.GetRequiredService<IElevatorController>();
+var renderer = services.GetRequiredService<IConsoleRenderer>();
+var inputHandler = new ConsoleInputHandler(controller, renderer);
 
-var statuses = controller.GetStatuses();
+var running = true;
 
-Console.WriteLine($"Simulation started with {statuses.Count()} elevators:");
-Console.WriteLine();
-
-foreach (var (status, index) in statuses.Select((s, i) => (s, i)))
+while (running)
 {
-    Console.WriteLine($"Elevator #{index + 1}");
-    Console.WriteLine($"  Floor:      {status.CurrentFloor}");
-    Console.WriteLine($"  Direction:  {status.Direction}");
-    Console.WriteLine($"  State:      {status.State}");
-    Console.WriteLine($"  Passengers: {status.PassengerCount} / {status.Capacity}");
+    renderer.RenderStatus(controller.GetStatuses());
+
     Console.WriteLine();
+    Console.WriteLine("  [1] Call elevator   [2] View status   [Q] Quit");
+    Console.Write("  > ");
+
+    var key = Console.ReadLine()?.Trim().ToUpperInvariant();
+
+    switch (key)
+    {
+        case "1":
+            inputHandler.HandleCallElevator(config.NumberOfFloors);
+            break;
+
+        case "2":
+            // this case just re-renders the status for now
+            break;
+
+        case "Q":
+            running = false;
+            break;
+
+        default:
+            renderer.RenderError(
+                $"'{key}' is not a valid option. Please choose 1, 2, or Q.");
+            Console.WriteLine("  Press any key to continue...");
+            Console.ReadKey();
+            break;
+    }
 }
 
-Console.WriteLine("Press any key to exit...");
-Console.ReadKey();
+Console.Clear();
+Console.WriteLine("Simulation ended. Goodbye.");
