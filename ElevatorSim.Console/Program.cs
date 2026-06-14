@@ -34,6 +34,9 @@ while (running)
     Console.WriteLine("  [1] Call elevator   [2] View status   [Q] Quit");
     Console.Write("  > ");
 
+    controller.OnElevatorMoved += message =>
+        renderer.RenderMessage(message);
+
     var key = Console.ReadLine()?.Trim().ToUpperInvariant();
 
     switch (key)
@@ -60,4 +63,3 @@ while (running)
 }
 
 Console.Clear();
-Console.WriteLine("Simulation ended. Goodbye.");

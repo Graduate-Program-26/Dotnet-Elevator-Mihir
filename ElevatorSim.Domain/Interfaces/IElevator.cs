@@ -13,4 +13,5 @@ public interface IElevator
     void RemovePassengers(int count);
     void BoardPassenger(Passenger passenger);
     void DeboardPassengers();
+    event Action<int>? OnArrival;
 }

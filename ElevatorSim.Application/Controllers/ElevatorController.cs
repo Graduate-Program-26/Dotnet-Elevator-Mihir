@@ -9,6 +9,7 @@ public class ElevatorController(
     public const int MinFloor = 1;
     public const int MaxFloor = 20;
     public int PendingRequestCount => _pendingRequests.Count;
+    public event Action<string>? OnElevatorMoved;
 
     public IEnumerable<ElevatorStatus> GetStatuses()
     {
@@ -21,49 +22,60 @@ public class ElevatorController(
             e.Capacity));
     }
 
-    public void RequestElevator(int floor, int passengerCount, int destinationFloor)
+    public void RequestElevator(int floor, IEnumerable<Passenger> passengers)
     {
         if (floor < MinFloor || floor > MaxFloor)
-        {
             throw new InvalidFloorException(floor);
-        }
 
-        if (destinationFloor < MinFloor || destinationFloor > MaxFloor)
+        var passengerList = passengers.ToList();
+
+        if (passengerList.Count == 0)
+            throw new ArgumentOutOfRangeException(
+                nameof(passengers),
+                "At least one passenger is required.");
+
+        var remaining = new Queue<Passenger>(passengerList);
+
+        while (remaining.Count > 0)
         {
-            throw new InvalidFloorException(destinationFloor);
-        }
-
-        if (passengerCount <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(passengerCount), "Passenger count must be greater than zero.");
-        }
-
-        var remaining = passengerCount;
-
-        while (remaining > 0)
-        {
-            var elevator = _dispatchStrategy.SelectElevator(_elevators, floor, remaining);
+            var elevator = _dispatchStrategy.SelectElevator(
+                _elevators, floor, remaining.Count);
 
             if (elevator is null)
             {
-                _pendingRequests.Enqueue(floor, remaining);
+                foreach (var p in remaining)
+                    _pendingRequests.Enqueue(floor, 1);
                 return;
             }
 
-            var available = elevator.Capacity - elevator.PassengerCount;
-            var boarding = Math.Min(remaining, available);
+            var boarded = new List<Passenger>();
+            while (remaining.Count > 0 && elevator.CanAcceptPassengers)
+            {
+                var passenger = remaining.Dequeue();
+                elevator.BoardPassenger(passenger);
+                boarded.Add(passenger);
+            }
 
             elevator.MoveToFloor(floor);
 
-            for (int i = 0; i < boarding; i++)
+            var destinations = boarded
+                .Select(p => p.DestinationFloor)
+                .Distinct()
+                .OrderBy(f => Math.Abs(f - floor));
+
+            var elevatorIndex = _elevators.ToList().IndexOf(elevator) + 1;
+
+            foreach (var destination in destinations)
             {
-                elevator.BoardPassenger(new Passenger(floor, destinationFloor));
+                var passengersAtDestination = boarded
+                    .Count(p => p.DestinationFloor == destination);
+
+                elevator.MoveToFloor(destination);
+                elevator.DeboardPassengers();
+
+                OnElevatorMoved?.Invoke(
+                    $"Elevator #{elevatorIndex} arrived at floor {destination}. {passengersAtDestination} passenger(s) dropped off.");
             }
-
-            elevator.MoveToFloor(destinationFloor);
-            elevator.DeboardPassengers();
-
-            remaining -= boarding;
         }
     }
 

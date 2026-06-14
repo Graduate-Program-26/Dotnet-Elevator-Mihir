@@ -16,6 +16,7 @@ public class ElevatorBase : IElevator
         _passengers
             .Select(passenger => passenger.DestinationFloor)
             .ToList();
+    public event Action<int>? OnArrival;
 
     protected ElevatorBase(int capacity, int startFloor = 1)
     {
@@ -28,21 +29,20 @@ public class ElevatorBase : IElevator
 
     public virtual void MoveToFloor(int floor)
     {
-        if (_currentFloor == floor)
+        if (floor == _currentFloor)
         {
             _direction = ElevatorDirection.Stationary;
             return;
         }
-        if (floor > _currentFloor)
-        {
-            _direction = ElevatorDirection.Up;
-        }
-        else if (floor < _currentFloor)
-        {
-            _direction = ElevatorDirection.Down;
-        }
+
+        _direction = floor > _currentFloor
+            ? ElevatorDirection.Up
+            : ElevatorDirection.Down;
+
         _currentFloor = floor;
         _state = ElevatorState.Idle;
+
+        OnArrival?.Invoke(_currentFloor);
     }
 
     public void AddPassengers(int count)
