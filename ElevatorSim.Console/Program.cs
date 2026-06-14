@@ -24,6 +24,8 @@ var controller = services.GetRequiredService<IElevatorController>();
 var renderer = services.GetRequiredService<IConsoleRenderer>();
 var inputHandler = new ConsoleInputHandler(controller, renderer);
 
+controller.OnElevatorMoved += message => renderer.RenderMessage(message);
+
 var running = true;
 
 while (running)
@@ -33,9 +35,6 @@ while (running)
     Console.WriteLine();
     Console.WriteLine("  [1] Call elevator   [2] View status   [Q] Quit");
     Console.Write("  > ");
-
-    controller.OnElevatorMoved += message =>
-        renderer.RenderMessage(message);
 
     var key = Console.ReadLine()?.Trim().ToUpperInvariant();
 
