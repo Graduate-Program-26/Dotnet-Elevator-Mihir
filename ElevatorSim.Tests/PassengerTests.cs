@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace ElevatorSim.Tests;
 
 public class PassengerTests
@@ -32,5 +34,44 @@ public class PassengerTests
         elevator.BoardPassenger(passenger);
 
         Assert.Contains(5, elevator.DestinationFloors);
+    }
+
+    [Fact]
+    public void DeboardPassengers_RemovesPassengerAtCurrentFloor()
+    {
+        var elevator = new PassengerElevator(capacity: 10, startFloor: 1);
+        elevator.BoardPassenger(new Passenger(StartingFloor: 1, DestinationFloor: 5));
+        elevator.BoardPassenger(new Passenger(StartingFloor: 1, DestinationFloor: 3));
+
+        elevator.MoveToFloor(5);
+        elevator.DeboardPassengers();
+
+        Assert.Equal(1, elevator.PassengerCount);
+    }
+
+    [Fact]
+    public void DeboardPassengers_RemovesOnlyPassengersAtCurrentFloor()
+    {
+        var elevator = new PassengerElevator(capacity: 10, startFloor: 1);
+        elevator.BoardPassenger(new Passenger(StartingFloor: 1, DestinationFloor: 5));
+        elevator.BoardPassenger(new Passenger(StartingFloor: 1, DestinationFloor: 5));
+        elevator.BoardPassenger(new Passenger(StartingFloor: 1, DestinationFloor: 3));
+
+        elevator.MoveToFloor(5);
+        elevator.DeboardPassengers();
+
+        Assert.Equal(1, elevator.PassengerCount);
+    }
+
+    [Fact]
+    public AsyncVoidMethodBuilder DeboardPassengers_DoesNothing_WhenNoPassengerAtCurrentFloor()
+    {
+        var elevator = new PassengerElevator(capacity: 10, startFloor: 1);
+        elevator.BoardPassenger(new Passenger(StartingFloor: 1, DestinationFloor: 5));
+
+        elevator.MoveToFloor(3);
+        elevator.DeboardPassengers();
+
+        Assert.Equal(1, elevator.PassengerCount);
     }
 }
