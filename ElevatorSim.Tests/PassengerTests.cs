@@ -1,5 +1,7 @@
 using System.Runtime.CompilerServices;
 
+using Moq;
+
 namespace ElevatorSim.Tests;
 
 public class PassengerTests
@@ -73,5 +75,29 @@ public class PassengerTests
         elevator.DeboardPassengers();
 
         Assert.Equal(1, elevator.PassengerCount);
+    }
+
+    [Fact]
+    public void RequestElevator_PassengerDeboardsAtDestination()
+    {
+        var elevator = new PassengerElevator(capacity: 10, startFloor: 1);
+        var mockStrategy = new Mock<IDispatchStrategy>();
+        mockStrategy
+            .Setup(s => s.SelectElevator(
+                It.IsAny<IEnumerable<IElevator>>(),
+                It.IsAny<int>(),
+                It.IsAny<int>()))
+            .Returns(elevator);
+
+        var controller = new ElevatorController([elevator], mockStrategy.Object);
+
+        controller.RequestElevator(floor: 1, passengerCount: 2, destinationFloor: 5);
+
+        Assert.Equal(5, elevator.CurrentFloor);
+        Assert.Equal(2, elevator.PassengerCount);
+
+        controller.ArriveAtFloor(5);
+
+        Assert.Equal(0, elevator.PassengerCount);
     }
 }
