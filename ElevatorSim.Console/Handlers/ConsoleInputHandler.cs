@@ -1,15 +1,9 @@
-public class ConsoleInputHandler
+public class ConsoleInputHandler(
+    IElevatorController controller,
+    IConsoleRenderer renderer)
 {
-    private readonly IElevatorController _controller;
-    private readonly IConsoleRenderer _renderer;
-
-    public ConsoleInputHandler(
-        IElevatorController controller,
-        IConsoleRenderer renderer)
-    {
-        _controller = controller;
-        _renderer = renderer;
-    }
+    private readonly IElevatorController _controller = controller;
+    private readonly IConsoleRenderer _renderer = renderer;
 
     public void HandleCallElevator(int maxFloor)
     {
