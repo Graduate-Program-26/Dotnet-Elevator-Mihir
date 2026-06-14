@@ -64,7 +64,7 @@ public class PassengerTests
     }
 
     [Fact]
-    public AsyncVoidMethodBuilder DeboardPassengers_DoesNothing_WhenNoPassengerAtCurrentFloor()
+    public void DeboardPassengers_DoesNothing_WhenNoPassengerAtCurrentFloor()
     {
         var elevator = new PassengerElevator(capacity: 10, startFloor: 1);
         elevator.BoardPassenger(new Passenger(StartingFloor: 1, DestinationFloor: 5));
