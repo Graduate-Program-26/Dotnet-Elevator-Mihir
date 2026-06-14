@@ -14,7 +14,7 @@ public class ElevatorBase : IElevator
     public int Capacity { get; }
     public IReadOnlyList<int> DestinationFloors =>
         _passengers
-            .Select(p => p.DestinationFloor)
+            .Select(passenger => passenger.DestinationFloor)
             .ToList();
 
     protected ElevatorBase(int capacity, int startFloor = 1)
@@ -78,6 +78,12 @@ public class ElevatorBase : IElevator
         }
 
         _passengers.Add(passenger);
+        _passengerCount = _passengers.Count;
+    }
+
+    public void DeboardPassengers()
+    {
+        _passengers.RemoveAll(passenger => passenger.DestinationFloor == _currentFloor);
         _passengerCount = _passengers.Count;
     }
 }

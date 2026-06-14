@@ -12,4 +12,5 @@ public interface IElevator
     void AddPassengers(int count);
     void RemovePassengers(int count);
     void BoardPassenger(Passenger passenger);
+    void DeboardPassengers();
 }
