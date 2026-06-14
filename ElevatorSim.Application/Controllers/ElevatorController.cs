@@ -61,6 +61,7 @@ public class ElevatorController(
             }
 
             elevator.MoveToFloor(destinationFloor);
+            elevator.DeboardPassengers();
 
             remaining -= boarding;
         }

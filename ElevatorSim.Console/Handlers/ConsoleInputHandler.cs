@@ -9,21 +9,20 @@ public class ConsoleInputHandler(
     {
         Console.WriteLine();
 
-        var floor = PromptInt(
-            $"  Enter floor number (1-{maxFloor}): ");
-
+        var floor = PromptInt($"  Enter current floor number (1-{maxFloor}): ");
         if (floor is null) return;
 
-        var passengers = PromptInt(
-            "  Enter number of passengers: ");
+        var destination = PromptInt($"  Enter destination floor number (1-{maxFloor}): ");
+        if (destination is null) return;
 
+        var passengers = PromptInt("  Enter number of passengers: ");
         if (passengers is null) return;
 
         try
         {
-            _controller.RequestElevator(floor.Value, passengers.Value);
+            _controller.RequestElevator(floor.Value, passengers.Value, destination.Value);
             _renderer.RenderMessage(
-                $"Elevator dispatched to floor {floor}.");
+                $"Elevator dispatched to floor number: {floor}. {passengers} passenger(s) heading to floor number: {destination}.");
         }
         catch (InvalidFloorException ex)
         {
