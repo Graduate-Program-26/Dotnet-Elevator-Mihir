@@ -21,20 +21,28 @@ public class ElevatorController(
             e.Capacity));
     }
 
-    public void RequestElevator(int floor, int passengerCount)
+    public void RequestElevator(int floor, int passengerCount, int destinationFloor)
     {
         if (floor < MinFloor || floor > MaxFloor)
+        {
             throw new InvalidFloorException(floor);
+        }
+
+        if (destinationFloor < MinFloor || destinationFloor > MaxFloor)
+        {
+            throw new InvalidFloorException(destinationFloor);
+        }
 
         if (passengerCount <= 0)
+        {
             throw new ArgumentOutOfRangeException(nameof(passengerCount), "Passenger count must be greater than zero.");
+        }
 
         var remaining = passengerCount;
 
         while (remaining > 0)
         {
-            var elevator = _dispatchStrategy.SelectElevator(
-                _elevators, floor, remaining);
+            var elevator = _dispatchStrategy.SelectElevator(_elevators, floor, remaining);
 
             if (elevator is null)
             {
@@ -46,9 +54,23 @@ public class ElevatorController(
             var boarding = Math.Min(remaining, available);
 
             elevator.MoveToFloor(floor);
-            elevator.AddPassengers(boarding);
+
+            for (int i = 0; i < boarding; i++)
+            {
+                elevator.BoardPassenger(new Passenger(floor, destinationFloor));
+            }
+
+            elevator.MoveToFloor(destinationFloor);
 
             remaining -= boarding;
+        }
+    }
+
+    public void ArriveAtFloor(int floor)
+    {
+        foreach (var elevator in _elevators.Where(elev => elev.CurrentFloor == floor))
+        {
+            elevator.DeboardPassengers();
         }
     }
 }
