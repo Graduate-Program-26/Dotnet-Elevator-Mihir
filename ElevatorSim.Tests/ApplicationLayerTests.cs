@@ -4,8 +4,6 @@ namespace ElevatorSim.Tests;
 
 public class ApplicationLayerTests
 {
-    private const int ValidDest = 10;
-
     [Fact]
     public void PassengerElevator_HasCorrectDefaultCapacity()
     {
