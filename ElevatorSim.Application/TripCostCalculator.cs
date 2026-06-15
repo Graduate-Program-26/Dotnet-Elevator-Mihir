@@ -24,14 +24,19 @@ public static class TripCostCalculator
         }
 
         const int directionChangePenalty = 5;
-        var penalty = CountDirectionChanges(elevator.CurrentFloor, startingFloor, destinations) * directionChangePenalty;
+        var penalty = CountDirectionChanges(elevator, startingFloor, destinations) * directionChangePenalty;
 
         return ((double)totalDistance / elevator.Speed) + penalty;
     }
 
-    private static int CountDirectionChanges(int startFloor, int originFloor, IEnumerable<int> destinations)
+    private static int CountDirectionChanges(IElevator elevator, int startingFloor, IEnumerable<int> destinations)
     {
-        var allStops = new[] { startFloor, originFloor }
+        if (elevator.Direction == ElevatorDirection.Stationary)
+        {
+            return 0;
+        }
+
+        var allStops = new[] { elevator.CurrentFloor, startingFloor }
             .Concat(destinations)
             .ToList();
 
