@@ -25,64 +25,93 @@ public class ElevatorController(
     public void RequestElevator(int floor, IEnumerable<Passenger> passengers)
     {
         if (floor < MinFloor || floor > MaxFloor)
+        {
             throw new InvalidFloorException(floor);
+        }
 
         var passengerList = passengers.ToList();
 
         if (passengerList.Count == 0)
-            throw new ArgumentOutOfRangeException(
-                nameof(passengers),
-                "At least one passenger is required.");
-
-        var remaining = new Queue<Passenger>(passengerList);
-
-        while (remaining.Count > 0)
         {
-            var elevator = _dispatchStrategy.SelectElevator(_elevators, floor, remaining.Count);
+            throw new ArgumentOutOfRangeException(nameof(passengers), "At least one passenger is required.");
+        }
 
-            if (elevator is null)
+        var selectedElevators = DetermineElevatorsNeeded(floor, passengerList);
+
+        if (selectedElevators.Count == 0)
+        {
+            foreach (var _ in passengerList)
             {
-                foreach (var p in remaining)
-                    _pendingRequests.Enqueue(floor, 1);
-                return;
+                _pendingRequests.Enqueue(floor, 1);
             }
 
-            var boarded = new List<Passenger>();
-            while (remaining.Count > 0 && elevator.CanAcceptPassengers)
+            OnElevatorMoved?.Invoke("No elevators available. Your request has been queued.");
+            return;
+        }
+
+        var assignments = PassengerDistributor.Distribute(passengerList, selectedElevators, floor);
+
+        foreach (var (elevator, assigned) in assignments)
+        {
+            if (assigned.Count == 0) continue;
+
+            foreach (var passenger in assigned)
             {
-                var passenger = remaining.Dequeue();
                 elevator.BoardPassenger(passenger);
-                boarded.Add(passenger);
             }
 
-            elevator.MoveToFloor(floor);
-
-            var destinations = boarded
-                .Select(p => p.DestinationFloor)
-                .Distinct()
-                .OrderBy(f => Math.Abs(f - floor));
-
-            var elevatorIndex = _elevators.ToList().IndexOf(elevator) + 1;
-
-            foreach (var destination in destinations)
-            {
-                var passengersAtDestination = boarded
-                    .Count(p => p.DestinationFloor == destination);
-
-                elevator.MoveToFloor(destination);
-                elevator.DeboardPassengers();
-
-                OnElevatorMoved?.Invoke(
-                    $"Elevator #{elevatorIndex} arrived at floor {destination}. {passengersAtDestination} passenger(s) dropped off.");
-            }
+            DeliverPassengers(elevator, floor, assigned);
         }
     }
 
-    public void ArriveAtFloor(int floor)
+    private List<IElevator> DetermineElevatorsNeeded(int floor, List<Passenger> passengers)
     {
-        foreach (var elevator in _elevators.Where(elev => elev.CurrentFloor == floor))
+        var selected = new List<IElevator>();
+        var remainingCount = passengers.Count;
+
+        var naturalGroupCount = PassengerGrouper
+            .Group(passengers, _elevators.Count())
+            .Count;
+
+        while (remainingCount > 0 || selected.Count < naturalGroupCount)
         {
+            var available = _elevators.Except(selected);
+
+            var elevator = _dispatchStrategy.SelectElevator(
+                available, floor, passengers);
+
+            if (elevator is null) break;
+
+            selected.Add(elevator);
+            remainingCount -= elevator.Capacity - elevator.PassengerCount;
+
+            if (selected.Count >= naturalGroupCount && remainingCount <= 0)
+                break;
+        }
+        return selected;
+    }
+
+    private void DeliverPassengers(IElevator elevator, int originFloor, List<Passenger> boarded)
+    {
+        var elevatorIndex = _elevators.ToList().IndexOf(elevator) + 1;
+
+        elevator.MoveToFloor(originFloor);
+
+        OnElevatorMoved?.Invoke($"Elevator #{elevatorIndex} dispatched to floor {originFloor} — {boarded.Count} passenger(s) boarding.");
+
+        var destinations = DestinationSorter
+            .SortByProximity(originFloor, boarded)
+            .ToList();
+
+        foreach (var destination in destinations)
+        {
+            var dropOffCount = boarded
+                .Count(p => p.DestinationFloor == destination);
+
+            elevator.MoveToFloor(destination);
             elevator.DeboardPassengers();
+
+            OnElevatorMoved?.Invoke($"Elevator #{elevatorIndex} arrived at floor {destination}. {dropOffCount} passenger(s) dropped off.");
         }
     }
 }
