@@ -317,7 +317,7 @@ public class ApplicationLayerTests
         var elevator = new PassengerElevator(startFloor: 3);
         var passengers = new List<Passenger>
         {
-            new Passenger(originFloor: 1, destinationFloor: 5)
+            new Passenger(StartingFloor: 1, DestinationFloor: 5)
         };
 
         var cost = TripCostCalculator.Calculate(elevator, startingFloor: 1, passengers);
