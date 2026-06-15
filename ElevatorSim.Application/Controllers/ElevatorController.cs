@@ -38,8 +38,7 @@ public class ElevatorController(
 
         while (remaining.Count > 0)
         {
-            var elevator = _dispatchStrategy.SelectElevator(
-                _elevators, floor, remaining.Count);
+            var elevator = _dispatchStrategy.SelectElevator(_elevators, floor, remaining.Count);
 
             if (elevator is null)
             {
