@@ -389,4 +389,42 @@ public class ApplicationLayerTests
 
         Assert.True(costWithReversal > costSameDirection);
     }
+
+    [Fact]
+    public void SelectElevator_PrefersFasterElevator_WhenEquidistant()
+    {
+        var passenger = new PassengerElevator(startFloor: 1);
+        var highSpeed = new HighSpeedElevator(startFloor: 1);
+        var strategy = new NearestAvailableDispatchStrategy();
+
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 1, DestinationFloor: 9)
+        };
+
+        var selected = strategy.SelectElevator([passenger, highSpeed], 1, passengers);
+
+        Assert.Equal(highSpeed, selected);
+    }
+
+    [Fact]
+    public void SelectElevator_PrefersElevatorGoingSameDirection()
+    {
+        var goingUp = new PassengerElevator(startFloor: 1);
+        goingUp.MoveToFloor(3);
+
+        var goingDown = new PassengerElevator(startFloor: 10);
+        goingDown.MoveToFloor(7);
+
+        var strategy = new NearestAvailableDispatchStrategy();
+
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 5, DestinationFloor: 8)
+        };
+
+        var selected = strategy.SelectElevator([goingUp, goingDown], 5, passengers);
+
+        Assert.Equal(goingUp, selected);
+    }
 }
