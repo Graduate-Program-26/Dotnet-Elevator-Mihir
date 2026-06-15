@@ -273,4 +273,27 @@ public class ApplicationLayerTests
         secondElevator.Verify(e => e.MoveToFloor(15), Times.Once);
         secondElevator.Verify(e => e.DeboardPassengers(), Times.Once);
     }
+
+    [Fact]
+    public void PassengerElevator_HasCorrectSpeed()
+    {
+        var elevator = new PassengerElevator();
+        Assert.Equal(1, elevator.Speed);
+    }
+
+    [Fact]
+    public void FreightElevator_HasLowerSpeed_ThanPassengerElevator()
+    {
+        var freight = new FreightElevator();
+        var passenger = new PassengerElevator();
+        Assert.True(freight.Speed < passenger.Speed);
+    }
+
+    [Fact]
+    public void HighSpeedElevator_HasHigherSpeed_ThanPassengerElevator()
+    {
+        var highSpeed = new HighSpeedElevator();
+        var passenger = new PassengerElevator();
+        Assert.True(highSpeed.Speed > passenger.Speed);
+    }
 }
