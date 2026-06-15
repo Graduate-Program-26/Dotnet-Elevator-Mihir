@@ -10,19 +10,31 @@ public class ConsoleInputHandler(
         Console.WriteLine();
 
         var floor = PromptInt($"  Enter floor number (1-{maxFloor}): ");
-        if (floor is null) return;
+        if (floor is null)
+        {
+            return;
+        }
+        if (floor > maxFloor || floor < 1)
+        {
+            throw new InvalidFloorException(floor.GetValueOrDefault());
+        }
 
         var passengerCount = PromptInt("  Enter number of passengers: ");
-        if (passengerCount is null) return;
+        if (passengerCount is null)
+        {
+            return;
+        }
 
         var passengers = new List<Passenger>();
 
         for (int i = 1; i <= passengerCount; i++)
         {
-            var destination = PromptInt(
-                $"  Enter destination floor for passenger {i} (1-{maxFloor}): ");
+            var destination = PromptInt($"  Enter destination floor for passenger {i} (1-{maxFloor}): ");
 
-            if (destination is null) return;
+            if (destination is null)
+            {
+                return;
+            }
 
             passengers.Add(new Passenger(floor.Value, destination.Value));
         }
