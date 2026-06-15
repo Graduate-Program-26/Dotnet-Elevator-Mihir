@@ -314,11 +314,11 @@ public class ApplicationLayerTests
     }
 
     [Fact]
-    public void FreightElevator_HasLowerSpeed_ThanPassengerElevator()
+    public void FreightElevator_HasHigherSpeed_ThanPassengerElevator()
     {
         var freight = new FreightElevator();
         var passenger = new PassengerElevator();
-        Assert.True(freight.Speed < passenger.Speed);
+        Assert.True(freight.Speed > passenger.Speed);
     }
 
     [Fact]
