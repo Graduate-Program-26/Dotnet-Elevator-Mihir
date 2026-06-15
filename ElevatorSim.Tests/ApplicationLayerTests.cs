@@ -296,4 +296,79 @@ public class ApplicationLayerTests
         var passenger = new PassengerElevator();
         Assert.True(highSpeed.Speed > passenger.Speed);
     }
+
+    [Fact]
+    public void CalculateCost_ReturnsCorrectCost_ForSingleDestination()
+    {
+        var elevator = new PassengerElevator(startFloor: 1); // speed 1
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 1, DestinationFloor: 5)
+        };
+
+        var cost = TripCostCalculator.Calculate(elevator, startingFloor: 1, passengers);
+
+        Assert.Equal(4, cost);
+    }
+
+    [Fact]
+    public void CalculateCost_IncludesDistanceToOrigin()
+    {
+        var elevator = new PassengerElevator(startFloor: 3);
+        var passengers = new List<Passenger>
+        {
+            new Passenger(originFloor: 1, destinationFloor: 5)
+        };
+
+        var cost = TripCostCalculator.Calculate(elevator, startingFloor: 1, passengers);
+
+        Assert.Equal(6, cost);
+    }
+
+    [Fact]
+    public void CalculateCost_AccountsForElevatorSpeed()
+    {
+        var elevator = new HighSpeedElevator(startFloor: 1);
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 1, DestinationFloor: 7)
+        };
+
+        var cost = TripCostCalculator.Calculate(elevator, startingFloor: 1, passengers);
+
+        Assert.Equal(2, cost);
+    }
+
+    [Fact]
+    public void CalculateCost_SumsDistanceAcrossMultipleStops()
+    {
+        var elevator = new PassengerElevator(startFloor: 1);
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 1, DestinationFloor: 3),
+            new Passenger(StartingFloor: 1, DestinationFloor: 7),
+            new Passenger(StartingFloor: 1, DestinationFloor: 5)
+        };
+
+        var cost = TripCostCalculator.Calculate(elevator, startingFloor: 1, passengers);
+
+        Assert.Equal(6, cost);
+    }
+
+    [Fact]
+    public void CalculateCost_LowerCost_ForFasterElevator()
+    {
+        var passenger = new PassengerElevator(startFloor: 1);
+        var highSpeed = new HighSpeedElevator(startFloor: 1);
+
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 1, DestinationFloor: 9)
+        };
+
+        var passengerCost = TripCostCalculator.Calculate(passenger, 1, passengers);
+        var highSpeedCost = TripCostCalculator.Calculate(highSpeed, 1, passengers);
+
+        Assert.True(highSpeedCost < passengerCost);
+    }
 }
