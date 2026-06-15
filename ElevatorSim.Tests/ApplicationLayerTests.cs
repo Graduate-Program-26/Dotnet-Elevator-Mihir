@@ -91,10 +91,15 @@ public class ApplicationLayerTests
         var elevatorOnFloor8 = new PassengerElevator(startFloor: 8);
         var strategy = new NearestAvailableDispatchStrategy();
 
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 5, DestinationFloor: 8)
+        };
+
         var selected = strategy.SelectElevator(
             [elevatorOnFloor2, elevatorOnFloor8],
             requestedFloor: 3,
-            passengerCount: 1);
+            passengers);
 
         Assert.Equal(elevatorOnFloor2, selected);
     }
@@ -108,10 +113,15 @@ public class ApplicationLayerTests
         var availableElevator = new PassengerElevator(capacity: 10, startFloor: 8);
         var strategy = new NearestAvailableDispatchStrategy();
 
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 5, DestinationFloor: 8)
+        };
+
         var selected = strategy.SelectElevator(
             [fullElevator, availableElevator],
             requestedFloor: 1,
-            passengerCount: 1);
+            passengers);
 
         Assert.Equal(availableElevator, selected);
     }
@@ -125,10 +135,15 @@ public class ApplicationLayerTests
         var availableElevator = new PassengerElevator(capacity: 10, startFloor: 8);
         var strategy = new NearestAvailableDispatchStrategy();
 
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 5, DestinationFloor: 8)
+        };
+
         var selected = strategy.SelectElevator(
             [doorsOpenElevator, availableElevator],
             requestedFloor: 1,
-            passengerCount: 1);
+            passengers);
 
         Assert.Equal(availableElevator, selected);
     }
@@ -138,10 +153,15 @@ public class ApplicationLayerTests
     {
         var strategy = new NearestAvailableDispatchStrategy();
 
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 5, DestinationFloor: 8)
+        };
+
         var selected = strategy.SelectElevator(
             [],
             requestedFloor: 5,
-            passengerCount: 1);
+            passengers);
 
         Assert.Null(selected);
     }
@@ -153,10 +173,15 @@ public class ApplicationLayerTests
         fullElevator.AddPassengers(2);
         var strategy = new NearestAvailableDispatchStrategy();
 
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 5, DestinationFloor: 8)
+        };
+
         var selected = strategy.SelectElevator(
             [fullElevator],
             requestedFloor: 5,
-            passengerCount: 1);
+            passengers);
 
         Assert.Null(selected);
     }
@@ -167,11 +192,15 @@ public class ApplicationLayerTests
         var elevatorOnFloor3 = new PassengerElevator(capacity: 10, startFloor: 3);
         var elevatorOnFloor7 = new PassengerElevator(capacity: 10, startFloor: 7);
         var strategy = new NearestAvailableDispatchStrategy();
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 5, DestinationFloor: 8)
+        };
 
         var selected = strategy.SelectElevator(
             [elevatorOnFloor3, elevatorOnFloor7],
             requestedFloor: 5,
-            passengerCount: 1);
+            passengers);
 
         Assert.NotNull(selected);
     }
@@ -224,7 +253,10 @@ public class ApplicationLayerTests
     {
         var mockStrategy = new Mock<IDispatchStrategy>();
         mockStrategy
-            .Setup(s => s.SelectElevator(It.IsAny<IEnumerable<IElevator>>(), It.IsAny<int>(), It.IsAny<int>()))
+            .Setup(s => s.SelectElevator(
+                It.IsAny<IEnumerable<IElevator>>(),
+                It.IsAny<int>(),
+                It.IsAny<IEnumerable<Passenger>>()))
             .Returns((IElevator?)null);
 
         var controller = new ElevatorController([], mockStrategy.Object);
@@ -252,7 +284,7 @@ public class ApplicationLayerTests
 
         var mockStrategy = new Mock<IDispatchStrategy>();
         mockStrategy
-            .SetupSequence(s => s.SelectElevator(It.IsAny<IEnumerable<IElevator>>(), 5, It.IsAny<int>()))
+            .SetupSequence(s => s.SelectElevator(It.IsAny<IEnumerable<IElevator>>(), 5, It.IsAny<IEnumerable<Passenger>>()))
             .Returns(firstElevator.Object)
             .Returns(secondElevator.Object);
 

@@ -86,17 +86,21 @@ public class PassengerTests
             .Setup(s => s.SelectElevator(
                 It.IsAny<IEnumerable<IElevator>>(),
                 It.IsAny<int>(),
-                It.IsAny<int>()))
+                It.IsAny<IEnumerable<Passenger>>()))
             .Returns(elevator);
 
         var controller = new ElevatorController([elevator], mockStrategy.Object);
 
-        controller.RequestElevator(floor: 1, passengerCount: 2, destinationFloor: 5);
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 5, DestinationFloor: 5),
+            new Passenger(StartingFloor: 5, DestinationFloor: 5)
+        };
+
+        controller.RequestElevator(floor: 1, passengers);
 
         Assert.Equal(5, elevator.CurrentFloor);
         Assert.Equal(2, elevator.PassengerCount);
-
-        controller.ArriveAtFloor(5);
 
         Assert.Equal(0, elevator.PassengerCount);
     }
