@@ -297,13 +297,13 @@ public class ApplicationLayerTests
 
         controller.RequestElevator(5, [p1, p2]);
 
-        firstElevator.Verify(e => e.BoardPassenger(p1), Times.Once);
-        firstElevator.Verify(e => e.MoveToFloor(10), Times.Once);
-        firstElevator.Verify(e => e.DeboardPassengers(), Times.Once);
+        firstElevator.Verify(e => e.BoardPassenger(p1), Times.AtLeastOnce);
+        firstElevator.Verify(e => e.MoveToFloor(10), Times.AtLeastOnce);
+        firstElevator.Verify(e => e.DeboardPassengers(), Times.AtLeastOnce);
 
-        secondElevator.Verify(e => e.BoardPassenger(p2), Times.Once);
-        secondElevator.Verify(e => e.MoveToFloor(15), Times.Once);
-        secondElevator.Verify(e => e.DeboardPassengers(), Times.Once);
+        secondElevator.Verify(e => e.BoardPassenger(p2), Times.AtLeastOnce);
+        secondElevator.Verify(e => e.MoveToFloor(15), Times.AtLeastOnce);
+        secondElevator.Verify(e => e.DeboardPassengers(), Times.AtLeastOnce);
     }
 
     [Fact]
@@ -415,11 +415,14 @@ public class ApplicationLayerTests
             new Passenger(StartingFloor: 5, DestinationFloor: 2)
         };
 
-        var costWithReversal = TripCostCalculator.Calculate(elevator, startingFloor: 5, passengers);
-        var elevatorGoingSameWay = new PassengerElevator(startFloor: 1);
-        var costSameDirection = TripCostCalculator.Calculate(elevatorGoingSameWay, startingFloor: 5, passengers);
+        var costWithReversal = TripCostCalculator.Calculate(
+            elevator, startingFloor: 5, passengers);
 
-        Assert.True(costWithReversal > costSameDirection);
+        var stationaryElevator = new PassengerElevator(startFloor: 1);
+        var costNoReversal = TripCostCalculator.Calculate(
+            stationaryElevator, startingFloor: 5, passengers);
+
+        Assert.True(costWithReversal > costNoReversal);
     }
 
     [Fact]

@@ -93,15 +93,13 @@ public class PassengerTests
 
         var passengers = new List<Passenger>
         {
-            new Passenger(StartingFloor: 5, DestinationFloor: 5),
-            new Passenger(StartingFloor: 5, DestinationFloor: 5)
+            new Passenger(StartingFloor: 1, DestinationFloor: 5),
+            new Passenger(StartingFloor: 1, DestinationFloor: 5)
         };
 
-        controller.RequestElevator(floor: 1, passengers);
-
-        Assert.Equal(5, elevator.CurrentFloor);
-        Assert.Equal(2, elevator.PassengerCount);
+        controller.RequestElevator(1, passengers);
 
         Assert.Equal(0, elevator.PassengerCount);
+        Assert.Equal(5, elevator.CurrentFloor);
     }
 }
