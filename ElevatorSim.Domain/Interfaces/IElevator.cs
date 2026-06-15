@@ -7,11 +7,12 @@ public interface IElevator
     int Capacity { get; }
     bool CanAcceptPassengers { get; }
     IReadOnlyList<int> DestinationFloors { get; }
+    event Action<int>? OnArrival;
+    int Speed { get; }
 
     void MoveToFloor(int floor);
     void AddPassengers(int count);
     void RemovePassengers(int count);
     void BoardPassenger(Passenger passenger);
     void DeboardPassengers();
-    event Action<int>? OnArrival;
 }

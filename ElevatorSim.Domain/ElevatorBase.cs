@@ -17,10 +17,12 @@ public class ElevatorBase : IElevator
             .Select(passenger => passenger.DestinationFloor)
             .ToList();
     public event Action<int>? OnArrival;
+    public int Speed { get; }
 
-    protected ElevatorBase(int capacity, int startFloor = 1)
+    protected ElevatorBase(int capacity, int speed, int startFloor = 1)
     {
         Capacity = capacity;
+        Speed = speed;
         _currentFloor = startFloor;
         _direction = ElevatorDirection.Stationary;
         _state = ElevatorState.Idle;
