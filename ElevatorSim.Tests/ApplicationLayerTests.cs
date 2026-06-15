@@ -371,4 +371,22 @@ public class ApplicationLayerTests
 
         Assert.True(highSpeedCost < passengerCost);
     }
+
+    [Fact]
+    public void CalculateCost_AddsPenalty_WhenElevatorMustReverseDirection()
+    {
+        var elevator = new PassengerElevator(startFloor: 5);
+        elevator.MoveToFloor(8);
+
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 5, DestinationFloor: 2)
+        };
+
+        var costWithReversal = TripCostCalculator.Calculate(elevator, startingFloor: 5, passengers);
+        var elevatorGoingSameWay = new PassengerElevator(startFloor: 1);
+        var costSameDirection = TripCostCalculator.Calculate(elevatorGoingSameWay, startingFloor: 5, passengers);
+
+        Assert.True(costWithReversal > costSameDirection);
+    }
 }
