@@ -34,6 +34,7 @@ public class ElevatorBase : IElevator
         if (floor == _currentFloor)
         {
             _direction = ElevatorDirection.Stationary;
+            _state = ElevatorState.Idle;
             return;
         }
 
@@ -41,7 +42,9 @@ public class ElevatorBase : IElevator
             ? ElevatorDirection.Up
             : ElevatorDirection.Down;
 
+        _state = ElevatorState.Moving;
         _currentFloor = floor;
+
         _state = ElevatorState.Idle;
 
         OnArrival?.Invoke(_currentFloor);

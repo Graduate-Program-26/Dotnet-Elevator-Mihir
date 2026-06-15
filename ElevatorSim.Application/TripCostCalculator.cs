@@ -36,22 +36,32 @@ public static class TripCostCalculator
             return 0;
         }
 
-        var allStops = new[] { elevator.CurrentFloor, startingFloor }
-            .Concat(destinations)
-            .ToList();
-
+        var currentDirection = elevator.Direction == ElevatorDirection.Up ? 1 : -1;
         var changes = 0;
-        for (int i = 1; i < allStops.Count - 1; i++)
-        {
-            var incoming = allStops[i] - allStops[i - 1];
-            var outgoing = allStops[i + 1] - allStops[i];
+        var currentFloor = startingFloor;
 
-            if (incoming != 0 && outgoing != 0 &&
-                Math.Sign(incoming) != Math.Sign(outgoing))
+        foreach (var destination in destinations)
+        {
+            if (destination == currentFloor) continue;
+
+            var nextDirection = destination > currentFloor ? 1 : -1;
+
+            if (nextDirection != currentDirection)
             {
                 changes++;
+                currentDirection = nextDirection;
             }
+
+            currentFloor = destination;
         }
+
+        if (startingFloor != elevator.CurrentFloor)
+        {
+            var directionToOrigin = startingFloor > elevator.CurrentFloor ? 1 : -1;
+            if (directionToOrigin != currentDirection)
+                changes++;
+        }
+
         return changes;
     }
 }

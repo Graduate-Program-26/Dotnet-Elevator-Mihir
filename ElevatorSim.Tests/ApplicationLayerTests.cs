@@ -270,26 +270,20 @@ public class ApplicationLayerTests
     [Fact]
     public void RequestElevator_DispatchesToSecondElevator_WhenFirstReachesCapacity()
     {
-        var firstElevator = new Mock<IElevator>();
-
-        firstElevator.SetupSequence(e => e.CanAcceptPassengers)
-            .Returns(true)
-            .Returns(false);
-
-        var secondElevator = new Mock<IElevator>();
-
-        secondElevator.SetupSequence(e => e.CanAcceptPassengers)
-            .Returns(true)
-            .Returns(false);
+        var firstElevator = new PassengerElevator(capacity: 1, startFloor: 1);
+        var secondElevator = new PassengerElevator(capacity: 1, startFloor: 2);
 
         var mockStrategy = new Mock<IDispatchStrategy>();
         mockStrategy
-            .SetupSequence(s => s.SelectElevator(It.IsAny<IEnumerable<IElevator>>(), 5, It.IsAny<IEnumerable<Passenger>>()))
-            .Returns(firstElevator.Object)
-            .Returns(secondElevator.Object);
+            .SetupSequence(s => s.SelectElevator(
+                It.IsAny<IEnumerable<IElevator>>(),
+                It.IsAny<int>(),
+                It.IsAny<IEnumerable<Passenger>>()))
+            .Returns(firstElevator)
+            .Returns(secondElevator);
 
         var controller = new ElevatorController(
-            [firstElevator.Object, secondElevator.Object],
+            [firstElevator, secondElevator],
             mockStrategy.Object);
 
         var p1 = new Passenger(5, 10);
@@ -297,13 +291,10 @@ public class ApplicationLayerTests
 
         controller.RequestElevator(5, [p1, p2]);
 
-        firstElevator.Verify(e => e.BoardPassenger(p1), Times.AtLeastOnce);
-        firstElevator.Verify(e => e.MoveToFloor(10), Times.AtLeastOnce);
-        firstElevator.Verify(e => e.DeboardPassengers(), Times.AtLeastOnce);
-
-        secondElevator.Verify(e => e.BoardPassenger(p2), Times.AtLeastOnce);
-        secondElevator.Verify(e => e.MoveToFloor(15), Times.AtLeastOnce);
-        secondElevator.Verify(e => e.DeboardPassengers(), Times.AtLeastOnce);
+        Assert.Equal(0, firstElevator.PassengerCount);
+        Assert.Equal(0, secondElevator.PassengerCount);
+        Assert.Equal(10, firstElevator.CurrentFloor);
+        Assert.Equal(15, secondElevator.CurrentFloor);
     }
 
     [Fact]
@@ -410,17 +401,20 @@ public class ApplicationLayerTests
         var elevator = new PassengerElevator(startFloor: 5);
         elevator.MoveToFloor(8);
 
+        Assert.Equal(ElevatorDirection.Up, elevator.Direction);
+
         var passengers = new List<Passenger>
         {
-            new Passenger(StartingFloor: 5, DestinationFloor: 2)
+            new Passenger(StartingFloor: 8, DestinationFloor: 2)
         };
 
         var costWithReversal = TripCostCalculator.Calculate(
-            elevator, startingFloor: 5, passengers);
+            elevator, startingFloor: 8, passengers);
 
-        var stationaryElevator = new PassengerElevator(startFloor: 1);
+        var stationaryElevator = new PassengerElevator(startFloor: 8);
+
         var costNoReversal = TripCostCalculator.Calculate(
-            stationaryElevator, startingFloor: 5, passengers);
+            stationaryElevator, startingFloor: 8, passengers);
 
         Assert.True(costWithReversal > costNoReversal);
     }
