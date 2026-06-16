@@ -457,4 +457,32 @@ public class ApplicationLayerTests
 
         Assert.Equal(goingUp, selected);
     }
+
+    [Fact]
+    public void RequestElevator_ThrowsInvalidFloorException_WhenDestinationOutOfRange()
+    {
+        var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object);
+
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 1, DestinationFloor: 99)
+        };
+
+        Assert.Throws<InvalidFloorException>(
+            () => controller.RequestElevator(1, passengers));
+    }
+
+    [Fact]
+    public void RequestElevator_ThrowsInvalidElevatorOperationException_WhenDestinationSameAsOrigin()
+    {
+        var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object);
+
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 5, DestinationFloor: 5)
+        };
+
+        Assert.Throws<InvalidElevatorOperationException>(
+            () => controller.RequestElevator(5, passengers));
+    }
 }
