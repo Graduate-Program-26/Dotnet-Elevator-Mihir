@@ -36,6 +36,24 @@ public class ElevatorController(
             throw new ArgumentOutOfRangeException(nameof(passengers), "At least one passenger is required.");
         }
 
+        var invalidDestination = passengerList
+            .FirstOrDefault(passenger =>
+            passenger.DestinationFloor < MinFloor ||
+            passenger.DestinationFloor > MaxFloor);
+
+        if (invalidDestination is not null)
+        {
+            throw new InvalidFloorException(invalidDestination.DestinationFloor);
+        }
+
+        var sameFloor = passengerList
+            .FirstOrDefault(p => p.DestinationFloor == floor);
+
+        if (sameFloor is not null)
+        {
+            throw new InvalidElevatorOperationException($"Passenger destination floor {sameFloor.DestinationFloor} " + $"is the same as the origin floor.");
+        }
+
         var selectedElevators = DetermineElevatorsNeeded(floor, passengerList);
 
         if (selectedElevators.Count == 0)

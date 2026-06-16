@@ -41,8 +41,8 @@ public class DomainUnitTests
 
         var passengers = new List<Passenger>
         {
-            new Passenger(StartingFloor: 5, DestinationFloor: 5),
-            new Passenger(StartingFloor: 5, DestinationFloor: 5)
+            new Passenger(StartingFloor: 5, DestinationFloor: 10),
+            new Passenger(StartingFloor: 5, DestinationFloor: 10)
         };
 
         controller.RequestElevator(5, passengers);
