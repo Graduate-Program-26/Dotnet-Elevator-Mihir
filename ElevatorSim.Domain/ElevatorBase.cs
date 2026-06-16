@@ -29,7 +29,7 @@ public class ElevatorBase : IElevator
         _passengerCount = 0;
     }
 
-    public virtual void MoveToFloor(int floor)
+    public void MoveToFloor(int floor)
     {
         if (floor == _currentFloor)
         {
