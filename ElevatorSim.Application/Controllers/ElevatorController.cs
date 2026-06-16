@@ -53,14 +53,16 @@ public class ElevatorController(
 
         foreach (var (elevator, assigned) in assignments)
         {
-            if (assigned.Count == 0) continue;
+            if (assigned.Count == 0)
+                continue;
 
-            foreach (var passenger in assigned)
-            {
+            var available = elevator.Capacity - elevator.PassengerCount;
+            var toBoard = assigned.Take(available).ToList();
+
+            foreach (var passenger in toBoard)
                 elevator.BoardPassenger(passenger);
-            }
 
-            DeliverPassengers(elevator, floor, assigned);
+            DeliverPassengers(elevator, floor, toBoard);
         }
     }
 

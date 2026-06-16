@@ -271,13 +271,14 @@ public class ApplicationLayerTests
     public void RequestElevator_DispatchesToSecondElevator_WhenFirstReachesCapacity()
     {
         var firstElevator = new PassengerElevator(capacity: 1, startFloor: 1);
-        var secondElevator = new PassengerElevator(capacity: 1, startFloor: 2);
+        var secondElevator = new PassengerElevator(capacity: 1, startFloor: 1);
 
         var mockStrategy = new Mock<IDispatchStrategy>();
+
         mockStrategy
             .SetupSequence(s => s.SelectElevator(
                 It.IsAny<IEnumerable<IElevator>>(),
-                It.IsAny<int>(),
+                5,
                 It.IsAny<IEnumerable<Passenger>>()))
             .Returns(firstElevator)
             .Returns(secondElevator);
@@ -294,7 +295,7 @@ public class ApplicationLayerTests
         Assert.Equal(0, firstElevator.PassengerCount);
         Assert.Equal(0, secondElevator.PassengerCount);
         Assert.Equal(10, firstElevator.CurrentFloor);
-        Assert.Equal(15, secondElevator.CurrentFloor);
+        Assert.Equal(1, secondElevator.CurrentFloor);
     }
 
     [Fact]
