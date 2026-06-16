@@ -9,7 +9,7 @@ public class ConsoleInputHandler(
     {
         Console.WriteLine();
 
-        var floor = PromptInt($"  Enter floor number (1-{maxFloor}): ");
+        var floor = PromptFloor($"  Enter floor number (1-{maxFloor}): ", 1, maxFloor);
         if (floor is null)
         {
             return;
@@ -29,10 +29,15 @@ public class ConsoleInputHandler(
 
         for (int i = 1; i <= passengerCount; i++)
         {
-            var destination = PromptInt($"  Enter destination floor for passenger {i} (1-{maxFloor}): ");
+            var destination = PromptFloor($"  Enter destination floor (1-{maxFloor}): ", 1, maxFloor);
 
             if (destination is null)
             {
+                return;
+            }
+            if (floor == destination)
+            {
+                HandleException($"Destination floor cannot be the same as origin floor {floor}.");
                 return;
             }
 
@@ -47,15 +52,15 @@ public class ConsoleInputHandler(
         }
         catch (InvalidFloorException ex)
         {
-            _renderer.RenderError(ex.Message);
+            HandleException(ex.Message);
         }
         catch (CapacityExceededException ex)
         {
-            _renderer.RenderError(ex.Message);
+            HandleException(ex.Message);
         }
         catch (ArgumentOutOfRangeException ex)
         {
-            _renderer.RenderError(ex.Message);
+            HandleException(ex.Message);
         }
     }
 
@@ -65,10 +70,45 @@ public class ConsoleInputHandler(
         var input = Console.ReadLine();
 
         if (int.TryParse(input, out var value))
+        {
             return value;
+        }
 
-        _renderer.RenderError(
-            $"'{input}' is not a valid number. Please try again.");
+        _renderer.RenderError($"'{input}' is not a valid number. Please enter a whole number.");
+        Console.WriteLine("  Press any key to continue...");
+        Console.ReadKey();
         return null;
+    }
+
+    private void HandleException(string message)
+    {
+        _renderer.RenderError(message);
+        Console.WriteLine();
+        Console.WriteLine("  Press any key to continue...");
+        Console.ReadKey();
+    }
+
+    private int? PromptFloor(string prompt, int min, int max)
+    {
+        Console.Write(prompt);
+        var input = Console.ReadLine();
+
+        if (!int.TryParse(input, out var value))
+        {
+            _renderer.RenderError($"'{input}' is not a valid number.");
+            Console.WriteLine("  Press any key to continue...");
+            Console.ReadKey();
+            return null;
+        }
+
+        if (value < min || value > max)
+        {
+            _renderer.RenderError($"Floor {value} is out of range. Please enter a floor between {min} and {max}.");
+            Console.WriteLine("  Press any key to continue...");
+            Console.ReadKey();
+            return null;
+        }
+
+        return value;
     }
 }
