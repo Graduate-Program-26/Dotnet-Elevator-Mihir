@@ -18,16 +18,43 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<IDispatchStrategy, NearestAvailableDispatchStrategy>();
 
+        RegisterPassengerElevators(services, config);
+        RegisterFreightElevators(services, config);
+        RegisterHighSpeedElevators(services, config);
+
+        services.AddSingleton<IElevatorController, ElevatorController>();
+        return services;
+    }
+
+    private static void RegisterPassengerElevators(
+        IServiceCollection services, SimulationConfig config)
+    {
         for (int i = 0; i < config.NumberOfElevators; i++)
         {
-            int elevatorIndex = i + 1;
             services.AddSingleton<IElevator>(
                 _ => new PassengerElevator(
                     capacity: config.ElevatorCapacity,
                     startFloor: 1));
         }
+    }
 
-        services.AddSingleton<IElevatorController, ElevatorController>();
-        return services;
+    private static void RegisterFreightElevators(
+        IServiceCollection services, SimulationConfig config)
+    {
+        for (int i = 0; i < config.NumberOfFreightElevators; i++)
+        {
+            services.AddSingleton<IElevator>(
+                _ => new FreightElevator(startFloor: 1));
+        }
+    }
+
+    private static void RegisterHighSpeedElevators(
+        IServiceCollection services, SimulationConfig config)
+    {
+        for (int i = 0; i < config.NumberOfHighSpeedElevators; i++)
+        {
+            services.AddSingleton<IElevator>(
+                _ => new HighSpeedElevator(startFloor: 1));
+        }
     }
 }
