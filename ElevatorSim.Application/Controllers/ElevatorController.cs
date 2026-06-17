@@ -117,7 +117,7 @@ public class ElevatorController(
 
         elevator.MoveToFloor(originFloor);
 
-        OnElevatorMoved?.Invoke($"Elevator #{elevatorIndex} dispatched to floor {originFloor} — {boarded.Count} passenger(s) boarding.");
+        OnElevatorMoved?.Invoke($"\e[36mElevator #{elevatorIndex} dispatched to floor {originFloor}. {boarded.Count} passenger(s) is/are on board.\e[0m");
 
         var destinations = DestinationSorter
             .SortByProximity(originFloor, boarded)
@@ -131,7 +131,7 @@ public class ElevatorController(
             elevator.MoveToFloor(destination);
             elevator.DeboardPassengers();
 
-            OnElevatorMoved?.Invoke($"Elevator #{elevatorIndex} arrived at floor {destination}. {dropOffCount} passenger(s) dropped off.");
+            OnElevatorMoved?.Invoke($"\e[32mElevator #{elevatorIndex} arrived at floor {destination}. {dropOffCount} passenger(s) dropped off.\e[0m");
         }
     }
 }
