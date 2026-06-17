@@ -47,8 +47,6 @@ public class ConsoleInputHandler(
         try
         {
             _controller.RequestElevator(floor.Value, passengers);
-            _renderer.RenderMessage(
-                $"Elevator dispatched to floor {floor} — {passengers.Count} passenger(s) boarding.");
         }
         catch (InvalidFloorException ex)
         {

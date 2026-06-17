@@ -24,7 +24,7 @@ var controller = services.GetRequiredService<IElevatorController>();
 var renderer = services.GetRequiredService<IConsoleRenderer>();
 var inputHandler = new ConsoleInputHandler(controller, renderer);
 
-controller.OnElevatorMoved += message => renderer.RenderMessage(message);
+controller.OnElevatorMoved += renderer.RenderMessage;
 
 var running = true;
 
