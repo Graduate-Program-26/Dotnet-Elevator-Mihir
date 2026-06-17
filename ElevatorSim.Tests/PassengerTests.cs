@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-
 using ElevatorSim.Application.Controllers;
 using ElevatorSim.Application.Elevators;
 using ElevatorSim.Domain.Interfaces;
