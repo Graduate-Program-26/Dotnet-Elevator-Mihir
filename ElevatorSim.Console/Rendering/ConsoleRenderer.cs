@@ -1,3 +1,5 @@
+namespace ElevatorSim.Rendering;
+
 public class ConsoleRenderer : IConsoleRenderer
 {
     private readonly List<string> _messages = [];

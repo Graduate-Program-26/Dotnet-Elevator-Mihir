@@ -1,3 +1,5 @@
+namespace ElevatorSim.Rendering;
+
 public interface IConsoleRenderer
 {
     void RenderStatus(IEnumerable<ElevatorStatus> statuses);

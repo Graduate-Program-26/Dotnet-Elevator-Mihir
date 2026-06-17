@@ -1,3 +1,7 @@
+using ElevatorSim.Rendering;
+
+namespace ElevatorSim.Inputs;
+
 public class ConsoleInputHandler(
     IElevatorController controller,
     IConsoleRenderer renderer)
