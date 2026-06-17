@@ -1,6 +1,9 @@
-﻿using Moq;
+﻿using ElevatorSim.Application.Controllers;
+using ElevatorSim.Application.Elevators;
+using ElevatorSim.Domain.Interfaces;
+using ElevatorSim.Domain.Models;
 
-using Timer = System.Timers.Timer;
+using Moq;
 
 namespace ElevatorSim.Tests;
 
