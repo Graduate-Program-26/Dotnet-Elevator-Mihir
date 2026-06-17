@@ -3,15 +3,18 @@ using ElevatorSim.Domain.Interfaces;
 using ElevatorSim.Domain.Models;
 using ElevatorSim.Rendering;
 
+using Microsoft.Extensions.Logging;
+
 namespace ElevatorSim.Inputs;
 
 public class ConsoleInputHandler(
     IElevatorController controller,
-    IConsoleRenderer renderer)
+    IConsoleRenderer renderer,
+    ILogger<ConsoleInputHandler> logger)
 {
     private readonly IElevatorController _controller = controller;
     private readonly IConsoleRenderer _renderer = renderer;
-
+    private readonly ILogger<ConsoleInputHandler> _logger = logger;
     public void HandleCallElevator(int maxFloor)
     {
         while (true)
@@ -91,6 +94,7 @@ public class ConsoleInputHandler(
 
     private void HandleException(string message)
     {
+        _logger.LogError(message, "User input resulted in an error: {Message}", message);
         _renderer.RenderError(message);
         Console.WriteLine();
         Console.WriteLine("  Press any key to try again...");

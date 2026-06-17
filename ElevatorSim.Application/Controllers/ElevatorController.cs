@@ -4,14 +4,19 @@ using ElevatorSim.Domain.Exceptions;
 using ElevatorSim.Domain.Interfaces;
 using ElevatorSim.Domain.Models;
 
+using Microsoft.Extensions.Logging;
+
+
 namespace ElevatorSim.Application.Controllers;
 
 public class ElevatorController(
     IEnumerable<IElevator> elevators,
-    IDispatchStrategy dispatchStrategy) : IElevatorController
+    IDispatchStrategy dispatchStrategy,
+    ILogger<ElevatorController> logger) : IElevatorController
 {
     private readonly IEnumerable<IElevator> _elevators = elevators;
     private readonly IDispatchStrategy _dispatchStrategy = dispatchStrategy;
+    private readonly ILogger<ElevatorController> _logger = logger;
     private readonly PassengerQueue _pendingRequests = new();
 
     public const int MinFloor = 1;
@@ -34,10 +39,13 @@ public class ElevatorController(
     {
         if (floor < MinFloor || floor > MaxFloor)
         {
+            _logger.LogWarning("Invalid floor {Floor} requested — must be between {MinFloor} and {MaxFloor}.", floor, MinFloor, MaxFloor);
             throw new InvalidFloorException(floor);
         }
 
         var passengerList = passengers.ToList();
+
+        _logger.LogInformation("Elevator requested for floor {Floor} with {PassengerCount} passenger(s).", floor, passengerList.Count);
 
         if (passengerList.Count == 0)
         {
@@ -51,6 +59,7 @@ public class ElevatorController(
 
         if (invalidDestination is not null)
         {
+            _logger.LogWarning("Rejecting request: Passenger has an invalid destination floor {DestinationFloor}.", invalidDestination.DestinationFloor);
             throw new InvalidFloorException(invalidDestination.DestinationFloor);
         }
 
@@ -59,6 +68,7 @@ public class ElevatorController(
 
         if (sameFloor is not null)
         {
+            _logger.LogWarning("Rejecting request: Passenger destination floor {DestinationFloor} matches origin floor {Floor}.", sameFloor.DestinationFloor, floor);
             throw new InvalidElevatorOperationException($"Passenger destination floor {sameFloor.DestinationFloor} " + $"is the same as the origin floor.");
         }
 
@@ -66,6 +76,8 @@ public class ElevatorController(
 
         if (selectedElevators.Count == 0)
         {
+            _logger.LogWarning("No elevators available for floor {Floor} — queuing {Count} passenger request(s).", floor, passengerList.Count);
+
             foreach (var _ in passengerList)
             {
                 _pendingRequests.Enqueue(floor, 1);
@@ -74,6 +86,8 @@ public class ElevatorController(
             OnElevatorMoved?.Invoke("No elevators available. Your request has been queued.");
             return;
         }
+
+        _logger.LogInformation("Dispatching {ElevatorCount} elevator(s) to floor {Floor}.", selectedElevators.Count, floor);
 
         var assignments = PassengerDistributor.Distribute(passengerList, selectedElevators, floor);
 
@@ -84,6 +98,9 @@ public class ElevatorController(
 
             var available = elevator.Capacity - elevator.PassengerCount;
             var toBoard = assigned.Take(available).ToList();
+
+            _logger.LogInformation("Elevator boarding {BoardingCount} of {AssignedCount} assigned passengers at floor {Floor}. (Remaining capacity: {Capacity})",
+                toBoard.Count, assigned.Count, floor, available - toBoard.Count);
 
             foreach (var passenger in toBoard)
                 elevator.BoardPassenger(passenger);
