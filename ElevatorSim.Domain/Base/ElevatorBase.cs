@@ -1,3 +1,9 @@
+using ElevatorSim.Domain.Exceptions;
+using ElevatorSim.Domain.Interfaces;
+using ElevatorSim.Domain.Models;
+
+namespace ElevatorSim.Domain.Base;
+
 public class ElevatorBase : IElevator
 {
     private int _currentFloor;

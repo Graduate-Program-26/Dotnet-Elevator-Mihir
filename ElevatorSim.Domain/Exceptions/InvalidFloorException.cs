@@ -1,3 +1,5 @@
+namespace ElevatorSim.Domain.Exceptions;
+
 public class InvalidFloorException : Exception
 {
     public int FloorNumber { get; }

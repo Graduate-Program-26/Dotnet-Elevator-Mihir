@@ -1,3 +1,5 @@
+namespace ElevatorSim.Domain.Exceptions;
+
 public class InvalidElevatorOperationException : Exception
 {
     public string Operation { get; }

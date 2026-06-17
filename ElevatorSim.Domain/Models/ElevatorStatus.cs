@@ -1,3 +1,5 @@
+namespace ElevatorSim.Domain.Models;
+
 public record ElevatorStatus(
     int ElevatorId,
     int CurrentFloor,

@@ -1,3 +1,5 @@
+namespace ElevatorSim.Domain.Exceptions;
+
 public class CapacityExceededException : Exception
 {
     public int Capacity { get; }

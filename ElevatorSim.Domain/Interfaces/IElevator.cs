@@ -1,3 +1,7 @@
+using ElevatorSim.Domain.Models;
+
+namespace ElevatorSim.Domain.Interfaces;
+
 public interface IElevator
 {
     int CurrentFloor { get; }
