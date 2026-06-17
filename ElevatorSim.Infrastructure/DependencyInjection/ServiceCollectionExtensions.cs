@@ -1,4 +1,12 @@
+using ElevatorSim.Application.Controllers;
+using ElevatorSim.Application.Dispatchers;
+using ElevatorSim.Application.Elevators;
+using ElevatorSim.Domain.Interfaces;
+using ElevatorSim.Infrastructure.Configuration;
+
 using Microsoft.Extensions.DependencyInjection;
+
+namespace ElevatorSim.Infrastructure.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {

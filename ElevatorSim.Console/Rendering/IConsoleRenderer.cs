@@ -1,3 +1,5 @@
+using ElevatorSim.Domain.Models;
+
 namespace ElevatorSim.Rendering;
 
 public interface IConsoleRenderer
