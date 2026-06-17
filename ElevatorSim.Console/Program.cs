@@ -11,8 +11,10 @@ using Serilog;
 
 var config = new SimulationConfig(
     NumberOfFloors: 20,
-    NumberOfElevators: 3,
-    ElevatorCapacity: 10);
+    NumberOfElevators: 1,
+    ElevatorCapacity: 10,
+    NumberOfFreightElevators: 1,
+    NumberOfHighSpeedElevators: 1);
 
 var services = new ServiceCollection()
     .AddLogging(logging =>
@@ -28,7 +30,7 @@ var services = new ServiceCollection()
 
 var controller = services.GetRequiredService<IElevatorController>();
 var renderer = services.GetRequiredService<IConsoleRenderer>();
-var inputHandler = new ConsoleInputHandler(controller, renderer);
+var inputHandler = new ConsoleInputHandler(controller, renderer, services.GetRequiredService<ILogger<ConsoleInputHandler>>());
 
 controller.OnElevatorMoved += renderer.RenderMessage;
 
