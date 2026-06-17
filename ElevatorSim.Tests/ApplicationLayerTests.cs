@@ -91,10 +91,15 @@ public class ApplicationLayerTests
         var elevatorOnFloor8 = new PassengerElevator(startFloor: 8);
         var strategy = new NearestAvailableDispatchStrategy();
 
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 5, DestinationFloor: 8)
+        };
+
         var selected = strategy.SelectElevator(
             [elevatorOnFloor2, elevatorOnFloor8],
             requestedFloor: 3,
-            passengerCount: 1);
+            passengers);
 
         Assert.Equal(elevatorOnFloor2, selected);
     }
@@ -108,10 +113,15 @@ public class ApplicationLayerTests
         var availableElevator = new PassengerElevator(capacity: 10, startFloor: 8);
         var strategy = new NearestAvailableDispatchStrategy();
 
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 5, DestinationFloor: 8)
+        };
+
         var selected = strategy.SelectElevator(
             [fullElevator, availableElevator],
             requestedFloor: 1,
-            passengerCount: 1);
+            passengers);
 
         Assert.Equal(availableElevator, selected);
     }
@@ -125,10 +135,15 @@ public class ApplicationLayerTests
         var availableElevator = new PassengerElevator(capacity: 10, startFloor: 8);
         var strategy = new NearestAvailableDispatchStrategy();
 
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 5, DestinationFloor: 8)
+        };
+
         var selected = strategy.SelectElevator(
             [doorsOpenElevator, availableElevator],
             requestedFloor: 1,
-            passengerCount: 1);
+            passengers);
 
         Assert.Equal(availableElevator, selected);
     }
@@ -138,10 +153,15 @@ public class ApplicationLayerTests
     {
         var strategy = new NearestAvailableDispatchStrategy();
 
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 5, DestinationFloor: 8)
+        };
+
         var selected = strategy.SelectElevator(
             [],
             requestedFloor: 5,
-            passengerCount: 1);
+            passengers);
 
         Assert.Null(selected);
     }
@@ -153,10 +173,15 @@ public class ApplicationLayerTests
         fullElevator.AddPassengers(2);
         var strategy = new NearestAvailableDispatchStrategy();
 
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 5, DestinationFloor: 8)
+        };
+
         var selected = strategy.SelectElevator(
             [fullElevator],
             requestedFloor: 5,
-            passengerCount: 1);
+            passengers);
 
         Assert.Null(selected);
     }
@@ -167,11 +192,15 @@ public class ApplicationLayerTests
         var elevatorOnFloor3 = new PassengerElevator(capacity: 10, startFloor: 3);
         var elevatorOnFloor7 = new PassengerElevator(capacity: 10, startFloor: 7);
         var strategy = new NearestAvailableDispatchStrategy();
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 5, DestinationFloor: 8)
+        };
 
         var selected = strategy.SelectElevator(
             [elevatorOnFloor3, elevatorOnFloor7],
             requestedFloor: 5,
-            passengerCount: 1);
+            passengers);
 
         Assert.NotNull(selected);
     }
@@ -198,7 +227,7 @@ public class ApplicationLayerTests
         var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object);
 
         Assert.Throws<InvalidFloorException>(
-            () => controller.RequestElevator(0, 1));
+            () => controller.RequestElevator(0, [new Passenger(1, 5)]));
     }
 
     [Fact]
@@ -207,99 +236,253 @@ public class ApplicationLayerTests
         var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object);
 
         Assert.Throws<InvalidFloorException>(
-            () => controller.RequestElevator(99, 1));
+            () => controller.RequestElevator(21, [new Passenger(21, 5)]));
     }
 
     [Fact]
-    public void RequestElevator_ThrowsArgumentException_WhenPassengerCountIsZero()
+    public void RequestElevator_ThrowsArgumentOutOfRangeException_WhenPassengerListIsEmpty()
     {
         var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object);
 
         Assert.Throws<ArgumentOutOfRangeException>(
-            () => controller.RequestElevator(5, 0));
+            () => controller.RequestElevator(5, Enumerable.Empty<Passenger>()));
     }
 
     [Fact]
-    public void RequestElevator_ThrowsArgumentException_WhenPassengerCountIsNegative()
-    {
-        var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object);
-
-        Assert.Throws<ArgumentOutOfRangeException>(
-            () => controller.RequestElevator(5, -1));
-    }
-
-    [Fact]
-    public void RequestElevator_DispatchesElevatorToRequestedFloor()
-    {
-        var mockElevator = new Mock<IElevator>();
-        mockElevator.Setup(e => e.CanAcceptPassengers).Returns(true);
-        mockElevator.Setup(e => e.State).Returns(ElevatorState.Idle);
-        mockElevator.Setup(e => e.Capacity).Returns(10);
-        mockElevator.Setup(e => e.PassengerCount).Returns(0);
-
-        var mockStrategy = new Mock<IDispatchStrategy>();
-        mockStrategy
-            .Setup(s => s.SelectElevator(
-                It.IsAny<IEnumerable<IElevator>>(), 5, 2))
-            .Returns(mockElevator.Object);
-
-        var controller = new ElevatorController([mockElevator.Object], mockStrategy.Object);
-
-        controller.RequestElevator(5, 2);
-
-        mockElevator.Verify(e => e.MoveToFloor(5), Times.Once);
-        mockElevator.Verify(e => e.AddPassengers(2), Times.Once);
-    }
-
-    [Fact]
-    public void RequestElevator_QueuesRequest_WhenNoElevatorAvailable()
+    public void RequestElevator_QueuesAllRemainingRequests_WhenNoElevatorAvailable()
     {
         var mockStrategy = new Mock<IDispatchStrategy>();
         mockStrategy
             .Setup(s => s.SelectElevator(
                 It.IsAny<IEnumerable<IElevator>>(),
                 It.IsAny<int>(),
-                It.IsAny<int>()))
+                It.IsAny<IEnumerable<Passenger>>()))
             .Returns((IElevator?)null);
 
         var controller = new ElevatorController([], mockStrategy.Object);
+        var passengers = new List<Passenger> { new(5, 10), new(5, 12) };
 
-        controller.RequestElevator(5, 2);
+        controller.RequestElevator(5, passengers);
 
-        Assert.Equal(1, controller.PendingRequestCount);
+        Assert.Equal(2, controller.PendingRequestCount);
     }
 
     [Fact]
-    public void RequestElevator_DispatchesSecondElevator_WhenFirstCannotFitAllPassengers()
+    public void RequestElevator_DispatchesToSecondElevator_WhenFirstReachesCapacity()
     {
-        var firstElevator = new Mock<IElevator>();
-        firstElevator.Setup(e => e.Capacity).Returns(10);
-        firstElevator.Setup(e => e.PassengerCount).Returns(8);
-        firstElevator.Setup(e => e.CanAcceptPassengers).Returns(true);
-        firstElevator.Setup(e => e.State).Returns(ElevatorState.Idle);
-
-        var secondElevator = new Mock<IElevator>();
-        secondElevator.Setup(e => e.Capacity).Returns(10);
-        secondElevator.Setup(e => e.PassengerCount).Returns(0);
-        secondElevator.Setup(e => e.CanAcceptPassengers).Returns(true);
-        secondElevator.Setup(e => e.State).Returns(ElevatorState.Idle);
+        var firstElevator = new PassengerElevator(capacity: 1, startFloor: 1);
+        var secondElevator = new PassengerElevator(capacity: 1, startFloor: 1);
 
         var mockStrategy = new Mock<IDispatchStrategy>();
+
         mockStrategy
             .SetupSequence(s => s.SelectElevator(
                 It.IsAny<IEnumerable<IElevator>>(),
-                It.IsAny<int>(),
-                It.IsAny<int>()))
-            .Returns(firstElevator.Object)
-            .Returns(secondElevator.Object);
+                5,
+                It.IsAny<IEnumerable<Passenger>>()))
+            .Returns(firstElevator)
+            .Returns(secondElevator);
 
         var controller = new ElevatorController(
-            [firstElevator.Object, secondElevator.Object],
+            [firstElevator, secondElevator],
             mockStrategy.Object);
 
-        controller.RequestElevator(5, 5);
+        var p1 = new Passenger(5, 10);
+        var p2 = new Passenger(5, 15);
 
-        firstElevator.Verify(e => e.AddPassengers(2), Times.Once);
-        secondElevator.Verify(e => e.AddPassengers(3), Times.Once);
+        controller.RequestElevator(5, [p1, p2]);
+
+        Assert.Equal(0, firstElevator.PassengerCount);
+        Assert.Equal(0, secondElevator.PassengerCount);
+        Assert.Equal(10, firstElevator.CurrentFloor);
+        Assert.Equal(1, secondElevator.CurrentFloor);
+    }
+
+    [Fact]
+    public void PassengerElevator_HasCorrectSpeed()
+    {
+        var elevator = new PassengerElevator();
+        Assert.Equal(1, elevator.Speed);
+    }
+
+    [Fact]
+    public void FreightElevator_HasHigherSpeed_ThanPassengerElevator()
+    {
+        var freight = new FreightElevator();
+        var passenger = new PassengerElevator();
+        Assert.True(freight.Speed > passenger.Speed);
+    }
+
+    [Fact]
+    public void HighSpeedElevator_HasHigherSpeed_ThanPassengerElevator()
+    {
+        var highSpeed = new HighSpeedElevator();
+        var passenger = new PassengerElevator();
+        Assert.True(highSpeed.Speed > passenger.Speed);
+    }
+
+    [Fact]
+    public void CalculateCost_ReturnsCorrectCost_ForSingleDestination()
+    {
+        var elevator = new PassengerElevator(startFloor: 1); // speed 1
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 1, DestinationFloor: 5)
+        };
+
+        var cost = TripCostCalculator.Calculate(elevator, startingFloor: 1, passengers);
+
+        Assert.Equal(4, cost);
+    }
+
+    [Fact]
+    public void CalculateCost_IncludesDistanceToOrigin()
+    {
+        var elevator = new PassengerElevator(startFloor: 3);
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 1, DestinationFloor: 5)
+        };
+
+        var cost = TripCostCalculator.Calculate(elevator, startingFloor: 1, passengers);
+
+        Assert.Equal(6, cost);
+    }
+
+    [Fact]
+    public void CalculateCost_AccountsForElevatorSpeed()
+    {
+        var elevator = new HighSpeedElevator(startFloor: 1);
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 1, DestinationFloor: 7)
+        };
+
+        var cost = TripCostCalculator.Calculate(elevator, startingFloor: 1, passengers);
+
+        Assert.Equal(2, cost);
+    }
+
+    [Fact]
+    public void CalculateCost_SumsDistanceAcrossMultipleStops()
+    {
+        var elevator = new PassengerElevator(startFloor: 1);
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 1, DestinationFloor: 3),
+            new Passenger(StartingFloor: 1, DestinationFloor: 7),
+            new Passenger(StartingFloor: 1, DestinationFloor: 5)
+        };
+
+        var cost = TripCostCalculator.Calculate(elevator, startingFloor: 1, passengers);
+
+        Assert.Equal(6, cost);
+    }
+
+    [Fact]
+    public void CalculateCost_LowerCost_ForFasterElevator()
+    {
+        var passenger = new PassengerElevator(startFloor: 1);
+        var highSpeed = new HighSpeedElevator(startFloor: 1);
+
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 1, DestinationFloor: 9)
+        };
+
+        var passengerCost = TripCostCalculator.Calculate(passenger, 1, passengers);
+        var highSpeedCost = TripCostCalculator.Calculate(highSpeed, 1, passengers);
+
+        Assert.True(highSpeedCost < passengerCost);
+    }
+
+    [Fact]
+    public void CalculateCost_AddsPenalty_WhenElevatorMustReverseDirection()
+    {
+        var elevator = new PassengerElevator(startFloor: 5);
+        elevator.MoveToFloor(8);
+
+        Assert.Equal(ElevatorDirection.Up, elevator.Direction);
+
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 8, DestinationFloor: 2)
+        };
+
+        var costWithReversal = TripCostCalculator.Calculate(
+            elevator, startingFloor: 8, passengers);
+
+        var stationaryElevator = new PassengerElevator(startFloor: 8);
+
+        var costNoReversal = TripCostCalculator.Calculate(
+            stationaryElevator, startingFloor: 8, passengers);
+
+        Assert.True(costWithReversal > costNoReversal);
+    }
+
+    [Fact]
+    public void SelectElevator_PrefersFasterElevator_WhenEquidistant()
+    {
+        var passenger = new PassengerElevator(startFloor: 1);
+        var highSpeed = new HighSpeedElevator(startFloor: 1);
+        var strategy = new NearestAvailableDispatchStrategy();
+
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 1, DestinationFloor: 9)
+        };
+
+        var selected = strategy.SelectElevator([passenger, highSpeed], 1, passengers);
+
+        Assert.Equal(highSpeed, selected);
+    }
+
+    [Fact]
+    public void SelectElevator_PrefersElevatorGoingSameDirection()
+    {
+        var goingUp = new PassengerElevator(startFloor: 1);
+        goingUp.MoveToFloor(3);
+
+        var goingDown = new PassengerElevator(startFloor: 10);
+        goingDown.MoveToFloor(7);
+
+        var strategy = new NearestAvailableDispatchStrategy();
+
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 5, DestinationFloor: 8)
+        };
+
+        var selected = strategy.SelectElevator([goingUp, goingDown], 5, passengers);
+
+        Assert.Equal(goingUp, selected);
+    }
+
+    [Fact]
+    public void RequestElevator_ThrowsInvalidFloorException_WhenDestinationOutOfRange()
+    {
+        var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object);
+
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 1, DestinationFloor: 99)
+        };
+
+        Assert.Throws<InvalidFloorException>(
+            () => controller.RequestElevator(1, passengers));
+    }
+
+    [Fact]
+    public void RequestElevator_ThrowsInvalidElevatorOperationException_WhenDestinationSameAsOrigin()
+    {
+        var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object);
+
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 5, DestinationFloor: 5)
+        };
+
+        Assert.Throws<InvalidElevatorOperationException>(
+            () => controller.RequestElevator(5, passengers));
     }
 }

@@ -34,15 +34,21 @@ public class DomainUnitTests
         var mockStrategy = new Mock<IDispatchStrategy>();
         mockStrategy
             .Setup(s => s.SelectElevator(
-                It.IsAny<IEnumerable<IElevator>>(), 5, 2))
+                It.IsAny<IEnumerable<IElevator>>(), 5, It.IsAny<IEnumerable<Passenger>>()))
             .Returns(mockElevator.Object);
 
         var controller = new ElevatorController([mockElevator.Object], mockStrategy.Object);
 
-        controller.RequestElevator(5, 2);
+        var passengers = new List<Passenger>
+        {
+            new Passenger(StartingFloor: 5, DestinationFloor: 10),
+            new Passenger(StartingFloor: 5, DestinationFloor: 10)
+        };
+
+        controller.RequestElevator(5, passengers);
 
         mockStrategy.Verify(s => s.SelectElevator(
-            It.IsAny<IEnumerable<IElevator>>(), 5, 2), Times.Once);
+            It.IsAny<IEnumerable<IElevator>>(), 5, It.IsAny<IEnumerable<Passenger>>()), Times.Once);
     }
 
     [Fact]

@@ -14,9 +14,6 @@ public class ConsoleRenderer : IConsoleRenderer
     public void RenderMessage(string message)
     {
         _messages.Add(message);
-
-        if (_messages.Count > 5)
-            _messages.RemoveAt(0);
     }
 
     public void RenderError(string message)

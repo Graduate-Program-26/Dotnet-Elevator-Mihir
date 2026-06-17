@@ -1,5 +1,6 @@
 public interface IElevatorController
 {
-    void RequestElevator(int floor, int passengerCount);
+    void RequestElevator(int floor, IEnumerable<Passenger> passengers);
     IEnumerable<ElevatorStatus> GetStatuses();
+    event Action<string>? OnElevatorMoved;
 }
