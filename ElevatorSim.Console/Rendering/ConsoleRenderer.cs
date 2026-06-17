@@ -25,9 +25,9 @@ public class ConsoleRenderer : IConsoleRenderer
 
     private void RenderTable(IEnumerable<ElevatorStatus> statuses)
     {
-        Console.WriteLine("╔══════════╦═══════╦═══════════╦══════════╦═════════════╗");
-        Console.WriteLine("║ Elevator ║ Floor ║ Direction ║  State   ║  Passengers ║");
-        Console.WriteLine("╠══════════╬═══════╬═══════════╬══════════╬═════════════╣");
+        Console.WriteLine("╔══════════╦═══════╦═══════════════╦══════════╦═════════════╗");
+        Console.WriteLine("║ Elevator ║ Floor ║   Direction   ║  State   ║  Passengers ║");
+        Console.WriteLine("╠══════════╬═══════╬═══════════════╬══════════╬═════════════╣");
 
         var statusList = statuses.ToList();
         for (int i = 0; i < statusList.Count; i++)
@@ -47,18 +47,17 @@ public class ConsoleRenderer : IConsoleRenderer
 
             Console.WriteLine($" ║ {passengers} ║");
         }
-
-        Console.WriteLine("╚══════════╩═══════╩═══════════╩══════════╩═════════════╝");
+        Console.WriteLine("╚══════════╩═══════╩═══════════════╩══════════╩═════════════╝");
     }
 
     private void RenderDirection(ElevatorDirection direction)
     {
         var (colour, label) = direction switch
         {
-            ElevatorDirection.Up => (ConsoleColor.Green, "   Up    "),
-            ElevatorDirection.Down => (ConsoleColor.Red, "  Down   "),
-            ElevatorDirection.Stationary => (ConsoleColor.Gray, "Stationary"),
-            _ => (ConsoleColor.White, " Unknown ")
+            ElevatorDirection.Up => (ConsoleColor.Green, "      Up     "),
+            ElevatorDirection.Down => (ConsoleColor.Red, "     Down    "),
+            ElevatorDirection.Stationary => (ConsoleColor.Gray, "  Stationary "),
+            _ => (ConsoleColor.White, "    Unknown    ")
         };
 
         Console.ForegroundColor = colour;
