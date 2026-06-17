@@ -1,5 +1,8 @@
 using ElevatorSim.Application.Queue;
 using ElevatorSim.Application.Utilities;
+using ElevatorSim.Domain.Exceptions;
+using ElevatorSim.Domain.Interfaces;
+using ElevatorSim.Domain.Models;
 
 namespace ElevatorSim.Application.Controllers;
 

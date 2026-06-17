@@ -1,4 +1,6 @@
 using ElevatorSim.Application.Utilities;
+using ElevatorSim.Domain.Interfaces;
+using ElevatorSim.Domain.Models;
 
 namespace ElevatorSim.Application.Dispatchers;
 

@@ -1,3 +1,5 @@
+using ElevatorSim.Domain.Base;
+
 namespace ElevatorSim.Application.Elevators;
 
 public class FreightElevator(int capacity = FreightElevator.DefaultCapacity, int startFloor = 1) : ElevatorBase(capacity, DefaultSpeed, startFloor)

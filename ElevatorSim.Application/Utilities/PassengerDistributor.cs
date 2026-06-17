@@ -1,3 +1,6 @@
+using ElevatorSim.Domain.Interfaces;
+using ElevatorSim.Domain.Models;
+
 namespace ElevatorSim.Application.Utilities;
 
 public static class PassengerDistributor
