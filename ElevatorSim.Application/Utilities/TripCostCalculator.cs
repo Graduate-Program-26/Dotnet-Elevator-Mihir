@@ -1,3 +1,5 @@
+namespace ElevatorSim.Application.Utilities;
+
 public static class TripCostCalculator
 {
     public static double Calculate(IElevator elevator, int startingFloor, IEnumerable<Passenger> passengers)

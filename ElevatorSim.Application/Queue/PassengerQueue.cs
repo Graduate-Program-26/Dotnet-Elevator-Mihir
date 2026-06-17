@@ -1,3 +1,5 @@
+namespace ElevatorSim.Application.Queue;
+
 public class PassengerQueue
 {
     private readonly Queue<(int Floor, int PassengerCount)> _queue = new();

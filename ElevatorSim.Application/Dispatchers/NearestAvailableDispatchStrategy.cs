@@ -1,3 +1,7 @@
+using ElevatorSim.Application.Utilities;
+
+namespace ElevatorSim.Application.Dispatchers;
+
 public class NearestAvailableDispatchStrategy : IDispatchStrategy
 {
     public IElevator? SelectElevator(IEnumerable<IElevator> elevators, int requestedFloor, IEnumerable<Passenger> passengers)

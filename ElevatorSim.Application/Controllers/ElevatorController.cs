@@ -1,3 +1,8 @@
+using ElevatorSim.Application.Queue;
+using ElevatorSim.Application.Utilities;
+
+namespace ElevatorSim.Application.Controllers;
+
 public class ElevatorController(
     IEnumerable<IElevator> elevators,
     IDispatchStrategy dispatchStrategy) : IElevatorController

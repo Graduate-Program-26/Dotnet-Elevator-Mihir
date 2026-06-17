@@ -1,3 +1,5 @@
+namespace ElevatorSim.Application.Utilities;
+
 public static class PassengerGrouper
 {
     public static List<List<Passenger>> Group(

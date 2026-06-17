@@ -1,3 +1,5 @@
+namespace ElevatorSim.Application.Utilities;
+
 public static class PassengerDistributor
 {
     public static Dictionary<IElevator, List<Passenger>> Distribute(IEnumerable<Passenger> passengers, IReadOnlyList<IElevator> elevators, int startingFloor)
