@@ -99,7 +99,8 @@ public class ApplicationLayerTests
     {
         var elevatorOnFloor2 = new PassengerElevator(startFloor: 2);
         var elevatorOnFloor8 = new PassengerElevator(startFloor: 8);
-        var strategy = new NearestAvailableDispatchStrategy();
+        var logger = new Mock<ILogger<NearestAvailableDispatchStrategy>>();
+        var strategy = new NearestAvailableDispatchStrategy(logger.Object);
 
         var passengers = new List<Passenger>
         {
@@ -121,7 +122,8 @@ public class ApplicationLayerTests
         fullElevator.AddPassengers(2);
 
         var availableElevator = new PassengerElevator(capacity: 10, startFloor: 8);
-        var strategy = new NearestAvailableDispatchStrategy();
+        var logger = new Mock<ILogger<NearestAvailableDispatchStrategy>>();
+        var strategy = new NearestAvailableDispatchStrategy(logger.Object);
 
         var passengers = new List<Passenger>
         {
@@ -143,7 +145,8 @@ public class ApplicationLayerTests
         doorsOpenElevator.OpenDoors();
 
         var availableElevator = new PassengerElevator(capacity: 10, startFloor: 8);
-        var strategy = new NearestAvailableDispatchStrategy();
+        var logger = new Mock<ILogger<NearestAvailableDispatchStrategy>>();
+        var strategy = new NearestAvailableDispatchStrategy(logger.Object);
 
         var passengers = new List<Passenger>
         {
@@ -161,7 +164,8 @@ public class ApplicationLayerTests
     [Fact]
     public void SelectElevator_ReturnsNull_WhenNoElevatorsAvailable()
     {
-        var strategy = new NearestAvailableDispatchStrategy();
+        var logger = new Mock<ILogger<NearestAvailableDispatchStrategy>>();
+        var strategy = new NearestAvailableDispatchStrategy(logger.Object);
 
         var passengers = new List<Passenger>
         {
@@ -181,7 +185,8 @@ public class ApplicationLayerTests
     {
         var fullElevator = new PassengerElevator(capacity: 2, startFloor: 1);
         fullElevator.AddPassengers(2);
-        var strategy = new NearestAvailableDispatchStrategy();
+        var logger = new Mock<ILogger<NearestAvailableDispatchStrategy>>();
+        var strategy = new NearestAvailableDispatchStrategy(logger.Object);
 
         var passengers = new List<Passenger>
         {
@@ -201,7 +206,8 @@ public class ApplicationLayerTests
     {
         var elevatorOnFloor3 = new PassengerElevator(capacity: 10, startFloor: 3);
         var elevatorOnFloor7 = new PassengerElevator(capacity: 10, startFloor: 7);
-        var strategy = new NearestAvailableDispatchStrategy();
+        var logger = new Mock<ILogger<NearestAvailableDispatchStrategy>>();
+        var strategy = new NearestAvailableDispatchStrategy(logger.Object);
         var passengers = new List<Passenger>
         {
             new Passenger(StartingFloor: 5, DestinationFloor: 8)
@@ -439,7 +445,8 @@ public class ApplicationLayerTests
     {
         var passenger = new PassengerElevator(startFloor: 1);
         var highSpeed = new HighSpeedElevator(startFloor: 1);
-        var strategy = new NearestAvailableDispatchStrategy();
+        var logger = new Mock<ILogger<NearestAvailableDispatchStrategy>>();
+        var strategy = new NearestAvailableDispatchStrategy(logger.Object);
 
         var passengers = new List<Passenger>
         {
@@ -460,7 +467,8 @@ public class ApplicationLayerTests
         var goingDown = new PassengerElevator(startFloor: 10);
         goingDown.MoveToFloor(7);
 
-        var strategy = new NearestAvailableDispatchStrategy();
+        var logger = new Mock<ILogger<NearestAvailableDispatchStrategy>>();
+        var strategy = new NearestAvailableDispatchStrategy(logger.Object);
 
         var passengers = new List<Passenger>
         {
