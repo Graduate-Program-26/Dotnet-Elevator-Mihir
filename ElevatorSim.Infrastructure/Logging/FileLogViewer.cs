@@ -1,4 +1,4 @@
-using ElevatorSim.Domain.Interfaces;
+namespace ElevatorSim.Infrastructure.Logging;
 
 public class FileLogViewer(string logFilePath) : ILogViewer
 {

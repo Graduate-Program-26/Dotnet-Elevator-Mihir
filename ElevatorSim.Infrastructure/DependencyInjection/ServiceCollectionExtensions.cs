@@ -3,6 +3,7 @@ using ElevatorSim.Application.Dispatchers;
 using ElevatorSim.Application.Elevators;
 using ElevatorSim.Domain.Interfaces;
 using ElevatorSim.Infrastructure.Configuration;
+using ElevatorSim.Infrastructure.Logging;
 
 using Microsoft.Extensions.DependencyInjection;
 

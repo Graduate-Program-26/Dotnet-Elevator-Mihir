@@ -1,5 +1,4 @@
-namespace ElevatorSim.Domain.Interfaces;
-
+namespace ElevatorSim.Infrastructure.Logging;
 /// <summary>
 /// Reads recent log entries from the simulation's log file for display.
 /// </summary>

@@ -1,6 +1,7 @@
 ﻿using ElevatorSim.Domain.Interfaces;
 using ElevatorSim.Infrastructure.Configuration;
 using ElevatorSim.Infrastructure.DependencyInjection;
+using ElevatorSim.Infrastructure.Logging;
 using ElevatorSim.Inputs;
 using ElevatorSim.Rendering;
 
