@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 using Serilog;
 
-const string LogFilePath = "logs/elevator-sim.log";
+const string logFilePath = "logs/elevator-sim.log";
 
 var config = new SimulationConfig(
     NumberOfFloors: 20,
@@ -25,7 +25,7 @@ var services = new ServiceCollection()
         logging.AddSerilog(new LoggerConfiguration()
             .WriteTo.Console()
             .WriteTo.File(
-                LogFilePath,
+                logFilePath,
                 outputTemplate: "{Timestamp:HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}")
             .CreateLogger());
     })

@@ -24,7 +24,7 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         SimulationConfig config)
     {
-        const string LogFilePath = "logs/elevator-sim.log";
+        const string logFilePath = "logs/elevator-sim.log";
         services.AddSingleton(config);
 
         services.AddSingleton<IDispatchStrategy, NearestAvailableDispatchStrategy>();
@@ -34,7 +34,7 @@ public static class ServiceCollectionExtensions
         RegisterHighSpeedElevators(services, config);
 
         services.AddSingleton<IElevatorController, ElevatorController>();
-        services.AddSingleton<ILogViewer>(_ => new FileLogViewer(LogFilePath));
+        services.AddSingleton<ILogViewer>(_ => new FileLogViewer(logFilePath));
         return services;
     }
 
