@@ -8,8 +8,18 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ElevatorSim.Infrastructure.DependencyInjection;
 
+/// <summary>
+/// A static class that provides extension methods for registering elevator simulation services with the dependency injection container.
+/// </summary>
 public static class ServiceCollectionExtensions
 {
+    /// <summary>
+    /// Registers the elevator simulation services with the dependency injection container, including elevators, dispatch strategy, and controller,
+    /// based on the provided simulation configuration.
+    /// </summary>
+    /// <param name="services">The dependency injection container.</param>
+    /// <param name="config">The simulation configuration.</param>
+    /// <returns>The updated dependency injection container.</returns>
     public static IServiceCollection AddElevatorSimulation(
         this IServiceCollection services,
         SimulationConfig config)
