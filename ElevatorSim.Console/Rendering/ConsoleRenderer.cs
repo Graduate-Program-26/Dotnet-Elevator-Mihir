@@ -105,4 +105,40 @@ public class ConsoleRenderer : IConsoleRenderer
             Console.WriteLine(message);
         }
     }
+
+    public void RenderLogs(IReadOnlyList<string> logEntries)
+    {
+        Console.Clear();
+        Console.WriteLine("  ═══ Simulation Logs ═══");
+        Console.WriteLine();
+
+        if (logEntries.Count == 0)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine("  No log entries yet.");
+            Console.ResetColor();
+        }
+        else
+        {
+            foreach (var entry in logEntries)
+            {
+                RenderLogLine(entry);
+            }
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("  Press any key to return to the main menu...");
+    }
+
+    private void RenderLogLine(string entry)
+    {
+        var colour = entry.Contains("[ERR]") ? ConsoleColor.Red
+            : entry.Contains("[WRN]") ? ConsoleColor.Yellow
+            : entry.Contains("[INF]") ? ConsoleColor.White
+            : ConsoleColor.DarkGray;
+
+        Console.ForegroundColor = colour;
+        Console.WriteLine($"  {entry}");
+        Console.ResetColor();
+    }
 }

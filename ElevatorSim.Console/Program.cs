@@ -9,6 +9,8 @@ using Microsoft.Extensions.Logging;
 
 using Serilog;
 
+const string LogFilePath = "logs/elevator-sim.log";
+
 var config = new SimulationConfig(
     NumberOfFloors: 20,
     NumberOfElevators: 1,
@@ -22,6 +24,9 @@ var services = new ServiceCollection()
         logging.ClearProviders();
         logging.AddSerilog(new LoggerConfiguration()
             .WriteTo.Console()
+            .WriteTo.File(
+                LogFilePath,
+                outputTemplate: "{Timestamp:HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}")
             .CreateLogger());
     })
     .AddElevatorSimulation(config)
@@ -35,13 +40,14 @@ var inputHandler = new ConsoleInputHandler(controller, renderer, services.GetReq
 controller.OnElevatorMoved += renderer.RenderMessage;
 
 var running = true;
+var logViewer = services.GetRequiredService<ILogViewer>();
 
 while (running)
 {
     renderer.RenderStatus(controller.GetStatuses());
 
     Console.WriteLine();
-    Console.WriteLine("  [1] Call elevator   [2] View status   [Q] Quit");
+    Console.WriteLine("  [1] Call elevator   [2] View logs   [Q] Quit");
     Console.Write("  > ");
 
     var key = Console.ReadLine()?.Trim().ToUpperInvariant();
@@ -53,7 +59,9 @@ while (running)
             break;
 
         case "2":
-            // this case just re-renders the status for now
+            var entries = logViewer.GetRecentEntries(30);
+            renderer.RenderLogs(entries);
+            Console.ReadKey();
             break;
 
         case "Q":

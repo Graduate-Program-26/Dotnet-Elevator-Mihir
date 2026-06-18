@@ -72,3 +72,5 @@ appsettings.Development.json
 secrets.json
 *.key
 *.pem
+
+logs/
