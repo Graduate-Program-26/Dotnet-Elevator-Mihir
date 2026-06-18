@@ -308,7 +308,6 @@ All three implement `IElevator` and are fully substitutable — the dispatcher w
 ### Future extensions
 
 - `async`/`await` concurrent elevator movement with per-floor delay
-- Serilog structured logging to file for audit trail
 - Basement floor support (negative floor numbers)
 - Priority floors (e.g. ground floor always served first)
 - Weight-based capacity instead of passenger count
