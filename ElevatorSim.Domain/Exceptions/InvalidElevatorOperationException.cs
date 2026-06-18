@@ -1,5 +1,8 @@
 namespace ElevatorSim.Domain.Exceptions;
 
+/// <summary>
+/// A custome exception that gets thrown when an invalid operation is performed on the elevator.
+/// </summary>
 public class InvalidElevatorOperationException : Exception
 {
     public string Operation { get; }

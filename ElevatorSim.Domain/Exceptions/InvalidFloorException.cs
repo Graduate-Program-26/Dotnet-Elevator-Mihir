@@ -1,5 +1,8 @@
 namespace ElevatorSim.Domain.Exceptions;
 
+/// <summary>
+/// A custom exception that gets thrown when an invalid floor number is provided to the elevator.
+/// </summary>
 public class InvalidFloorException : Exception
 {
     public int FloorNumber { get; }
