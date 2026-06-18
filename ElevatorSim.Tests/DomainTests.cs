@@ -3,6 +3,8 @@ using ElevatorSim.Application.Elevators;
 using ElevatorSim.Domain.Interfaces;
 using ElevatorSim.Domain.Models;
 
+using Microsoft.Extensions.Logging;
+
 using Moq;
 
 namespace ElevatorSim.Tests;
@@ -40,7 +42,9 @@ public class DomainUnitTests
                 It.IsAny<IEnumerable<IElevator>>(), 5, It.IsAny<IEnumerable<Passenger>>()))
             .Returns(mockElevator.Object);
 
-        var controller = new ElevatorController([mockElevator.Object], mockStrategy.Object);
+        var logger = new Mock<ILogger<ElevatorController>>();
+
+        var controller = new ElevatorController([mockElevator.Object], mockStrategy.Object, logger.Object);
 
         var passengers = new List<Passenger>
         {
@@ -59,7 +63,8 @@ public class DomainUnitTests
     {
         var elevator = new PassengerElevator(capacity: 10, startFloor: 1);
         var mockStrategy = new Mock<IDispatchStrategy>();
-        var controller = new ElevatorController([elevator], mockStrategy.Object);
+        var logger = new Mock<ILogger<ElevatorController>>();
+        var controller = new ElevatorController([elevator], mockStrategy.Object, logger.Object);
 
         var statuses = controller.GetStatuses();
 

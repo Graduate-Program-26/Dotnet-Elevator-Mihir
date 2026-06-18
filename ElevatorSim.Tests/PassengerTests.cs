@@ -3,6 +3,8 @@ using ElevatorSim.Application.Elevators;
 using ElevatorSim.Domain.Interfaces;
 using ElevatorSim.Domain.Models;
 
+using Microsoft.Extensions.Logging;
+
 using Moq;
 
 namespace ElevatorSim.Tests;
@@ -92,7 +94,9 @@ public class PassengerTests
                 It.IsAny<IEnumerable<Passenger>>()))
             .Returns(elevator);
 
-        var controller = new ElevatorController([elevator], mockStrategy.Object);
+        var logger = new Mock<ILogger<ElevatorController>>();
+
+        var controller = new ElevatorController([elevator], mockStrategy.Object, logger.Object);
 
         var passengers = new List<Passenger>
         {

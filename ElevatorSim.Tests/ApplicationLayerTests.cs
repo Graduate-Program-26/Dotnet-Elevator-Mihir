@@ -6,6 +6,8 @@ using ElevatorSim.Domain.Exceptions;
 using ElevatorSim.Domain.Interfaces;
 using ElevatorSim.Domain.Models;
 
+using Microsoft.Extensions.Logging;
+
 using Moq;
 
 namespace ElevatorSim.Tests;
@@ -218,7 +220,8 @@ public class ApplicationLayerTests
     {
         var elevator = new PassengerElevator(capacity: 10, startFloor: 1);
         var mockStrategy = new Mock<IDispatchStrategy>();
-        var controller = new ElevatorController([elevator], mockStrategy.Object);
+        var logger = new Mock<ILogger<ElevatorController>>();
+        var controller = new ElevatorController([elevator], mockStrategy.Object, logger.Object);
 
         var statuses = controller.GetStatuses();
 
@@ -232,7 +235,8 @@ public class ApplicationLayerTests
     [Fact]
     public void RequestElevator_ThrowsInvalidFloorException_WhenFloorBelowMinimum()
     {
-        var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object);
+        var logger = new Mock<ILogger<ElevatorController>>();
+        var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object, logger.Object);
 
         Assert.Throws<InvalidFloorException>(
             () => controller.RequestElevator(0, [new Passenger(1, 5)]));
@@ -241,7 +245,8 @@ public class ApplicationLayerTests
     [Fact]
     public void RequestElevator_ThrowsInvalidFloorException_WhenFloorAboveMaximum()
     {
-        var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object);
+        var logger = new Mock<ILogger<ElevatorController>>();
+        var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object, logger.Object);
 
         Assert.Throws<InvalidFloorException>(
             () => controller.RequestElevator(21, [new Passenger(21, 5)]));
@@ -250,7 +255,8 @@ public class ApplicationLayerTests
     [Fact]
     public void RequestElevator_ThrowsArgumentOutOfRangeException_WhenPassengerListIsEmpty()
     {
-        var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object);
+        var logger = new Mock<ILogger<ElevatorController>>();
+        var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object, logger.Object);
 
         Assert.Throws<ArgumentOutOfRangeException>(
             () => controller.RequestElevator(5, Enumerable.Empty<Passenger>()));
@@ -267,7 +273,8 @@ public class ApplicationLayerTests
                 It.IsAny<IEnumerable<Passenger>>()))
             .Returns((IElevator?)null);
 
-        var controller = new ElevatorController([], mockStrategy.Object);
+        var logger = new Mock<ILogger<ElevatorController>>();
+        var controller = new ElevatorController([], mockStrategy.Object, logger.Object);
         var passengers = new List<Passenger> { new(5, 10), new(5, 12) };
 
         controller.RequestElevator(5, passengers);
@@ -291,9 +298,8 @@ public class ApplicationLayerTests
             .Returns(firstElevator)
             .Returns(secondElevator);
 
-        var controller = new ElevatorController(
-            [firstElevator, secondElevator],
-            mockStrategy.Object);
+        var logger = new Mock<ILogger<ElevatorController>>();
+        var controller = new ElevatorController([firstElevator, secondElevator], mockStrategy.Object, logger.Object);
 
         var p1 = new Passenger(5, 10);
         var p2 = new Passenger(5, 15);
@@ -469,7 +475,8 @@ public class ApplicationLayerTests
     [Fact]
     public void RequestElevator_ThrowsInvalidFloorException_WhenDestinationOutOfRange()
     {
-        var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object);
+        var logger = new Mock<ILogger<ElevatorController>>();
+        var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object, logger.Object);
 
         var passengers = new List<Passenger>
         {
@@ -483,7 +490,8 @@ public class ApplicationLayerTests
     [Fact]
     public void RequestElevator_ThrowsInvalidElevatorOperationException_WhenDestinationSameAsOrigin()
     {
-        var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object);
+        var logger = new Mock<ILogger<ElevatorController>>();
+        var controller = new ElevatorController([], new Mock<IDispatchStrategy>().Object, logger.Object);
 
         var passengers = new List<Passenger>
         {
