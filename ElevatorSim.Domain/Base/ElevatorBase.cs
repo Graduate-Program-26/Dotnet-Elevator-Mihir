@@ -4,6 +4,9 @@ using ElevatorSim.Domain.Models;
 
 namespace ElevatorSim.Domain.Base;
 
+/// <summary>
+/// An abstract base class for elevators that implements the IElevator interface. This class provides common functionality for all elevator types.
+/// </summary>
 public class ElevatorBase : IElevator
 {
     private int _currentFloor;
