@@ -1,5 +1,21 @@
+using ElevatorSim.Domain.Interfaces;
+using ElevatorSim.Domain.Models;
+
+namespace ElevatorSim.Application.Utilities;
+
+/// <summary>
+/// A utility class that distributes passengers to elevators based on destination floor proximity and trip cost calculations.
+/// </summary>
 public static class PassengerDistributor
 {
+    /// <summary>
+    /// Groups passengers by destination floor proximity and assigns them to elevators based on trip cost calculations.
+    /// The capacity of elevators is respected and passengers are distributed to minimize total travel time and direction changes.
+    /// </summary>
+    /// <param name="passengers">The list of passengers to distribute.</param>
+    /// <param name="elevators">The list of available elevators.</param>
+    /// <param name="startingFloor">The floor from which passengers are requesting an elevator.</param>
+    /// <returns>A dictionary mapping each elevator to the list of passengers assigneed to it.</returns>
     public static Dictionary<IElevator, List<Passenger>> Distribute(IEnumerable<Passenger> passengers, IReadOnlyList<IElevator> elevators, int startingFloor)
     {
         var assignments = elevators

@@ -1,66 +1,78 @@
+using ElevatorSim.Domain.Exceptions;
+using ElevatorSim.Domain.Interfaces;
+using ElevatorSim.Domain.Models;
+using ElevatorSim.Rendering;
+
+using Microsoft.Extensions.Logging;
+
+namespace ElevatorSim.Inputs;
+
 public class ConsoleInputHandler(
     IElevatorController controller,
-    IConsoleRenderer renderer)
+    IConsoleRenderer renderer,
+    ILogger<ConsoleInputHandler> logger)
 {
     private readonly IElevatorController _controller = controller;
     private readonly IConsoleRenderer _renderer = renderer;
-
+    private readonly ILogger<ConsoleInputHandler> _logger = logger;
     public void HandleCallElevator(int maxFloor)
     {
-        Console.WriteLine();
-
-        var floor = PromptFloor($"  Enter floor number (1-{maxFloor}): ", 1, maxFloor);
-        if (floor is null)
+        while (true)
         {
-            return;
-        }
-        if (floor > maxFloor || floor < 1)
-        {
-            throw new InvalidFloorException(floor.GetValueOrDefault());
-        }
+            Console.WriteLine();
 
-        var passengerCount = PromptInt("  Enter number of passengers: ");
-        if (passengerCount is null)
-        {
-            return;
-        }
-
-        var passengers = new List<Passenger>();
-
-        for (int i = 1; i <= passengerCount; i++)
-        {
-            var destination = PromptFloor($"  Enter destination floor (1-{maxFloor}): ", 1, maxFloor);
-
-            if (destination is null)
+            var floor = PromptFloor($"  Enter floor number (1-{maxFloor}): ", 1, maxFloor);
+            if (floor is null)
             {
                 return;
             }
-            if (floor == destination)
+            if (floor > maxFloor || floor < 1)
             {
-                HandleException($"Destination floor cannot be the same as origin floor {floor}.");
+                throw new InvalidFloorException(floor.GetValueOrDefault());
+            }
+
+            var passengerCount = PromptInt("  Enter number of passengers: ");
+            if (passengerCount is null)
+            {
                 return;
             }
 
-            passengers.Add(new Passenger(floor.Value, destination.Value));
-        }
+            var passengers = new List<Passenger>();
 
-        try
-        {
-            _controller.RequestElevator(floor.Value, passengers);
-            _renderer.RenderMessage(
-                $"Elevator dispatched to floor {floor} — {passengers.Count} passenger(s) boarding.");
-        }
-        catch (InvalidFloorException ex)
-        {
-            HandleException(ex.Message);
-        }
-        catch (CapacityExceededException ex)
-        {
-            HandleException(ex.Message);
-        }
-        catch (ArgumentOutOfRangeException ex)
-        {
-            HandleException(ex.Message);
+            for (int i = 1; i <= passengerCount; i++)
+            {
+                var destination = PromptFloor($"  Enter destination floor (1-{maxFloor}): ", 1, maxFloor);
+
+                if (destination is null)
+                {
+                    return;
+                }
+                if (floor == destination)
+                {
+                    HandleException($"Destination floor cannot be the same as origin floor {floor}.");
+                    continue;
+                }
+
+                passengers.Add(new Passenger(floor.Value, destination.Value));
+            }
+
+            try
+            {
+                _controller.RequestElevator(floor.Value, passengers);
+                return;
+            }
+            catch (InvalidFloorException ex)
+            {
+                HandleException(ex.Message);
+            }
+            catch (CapacityExceededException ex)
+            {
+                HandleException(ex.Message);
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                HandleException(ex.Message);
+            }
         }
     }
 
@@ -82,33 +94,37 @@ public class ConsoleInputHandler(
 
     private void HandleException(string message)
     {
+        _logger.LogError(message, "User input resulted in an error: {Message}", message);
         _renderer.RenderError(message);
         Console.WriteLine();
-        Console.WriteLine("  Press any key to continue...");
+        Console.WriteLine("  Press any key to try again...");
         Console.ReadKey();
     }
 
     private int? PromptFloor(string prompt, int min, int max)
     {
-        Console.Write(prompt);
-        var input = Console.ReadLine();
-
-        if (!int.TryParse(input, out var value))
+        while (true)
         {
-            _renderer.RenderError($"'{input}' is not a valid number.");
-            Console.WriteLine("  Press any key to continue...");
-            Console.ReadKey();
-            return null;
-        }
+            Console.Write(prompt);
+            var input = Console.ReadLine();
 
-        if (value < min || value > max)
-        {
-            _renderer.RenderError($"Floor {value} is out of range. Please enter a floor between {min} and {max}.");
-            Console.WriteLine("  Press any key to continue...");
-            Console.ReadKey();
-            return null;
-        }
+            if (!int.TryParse(input, out var value))
+            {
+                _renderer.RenderError($"'{input}' is not a valid number.");
+                Console.WriteLine("  Press any key to continue...");
+                Console.ReadKey();
+                continue;
+            }
 
-        return value;
+            if (value < min || value > max)
+            {
+                _renderer.RenderError($"Floor {value} is out of range. Please enter a floor between {min} and {max}.");
+                Console.WriteLine("  Press any key to continue...");
+                Console.ReadKey();
+                continue;
+            }
+
+            return value;
+        }
     }
 }

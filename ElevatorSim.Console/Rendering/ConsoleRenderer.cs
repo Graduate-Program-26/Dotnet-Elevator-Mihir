@@ -1,3 +1,7 @@
+using ElevatorSim.Domain.Models;
+
+namespace ElevatorSim.Rendering;
+
 public class ConsoleRenderer : IConsoleRenderer
 {
     private readonly List<string> _messages = [];
@@ -25,9 +29,9 @@ public class ConsoleRenderer : IConsoleRenderer
 
     private void RenderTable(IEnumerable<ElevatorStatus> statuses)
     {
-        Console.WriteLine("╔══════════╦═══════╦═══════════╦══════════╦═════════════╗");
-        Console.WriteLine("║ Elevator ║ Floor ║ Direction ║  State   ║  Passengers ║");
-        Console.WriteLine("╠══════════╬═══════╬═══════════╬══════════╬═════════════╣");
+        Console.WriteLine("╔══════════╦═══════╦═══════════════╦══════════╦═════════════╗");
+        Console.WriteLine("║ Elevator ║ Floor ║   Direction   ║  State   ║  Passengers ║");
+        Console.WriteLine("╠══════════╬═══════╬═══════════════╬══════════╬═════════════╣");
 
         var statusList = statuses.ToList();
         for (int i = 0; i < statusList.Count; i++)
@@ -47,18 +51,17 @@ public class ConsoleRenderer : IConsoleRenderer
 
             Console.WriteLine($" ║ {passengers} ║");
         }
-
-        Console.WriteLine("╚══════════╩═══════╩═══════════╩══════════╩═════════════╝");
+        Console.WriteLine("╚══════════╩═══════╩═══════════════╩══════════╩═════════════╝");
     }
 
     private void RenderDirection(ElevatorDirection direction)
     {
         var (colour, label) = direction switch
         {
-            ElevatorDirection.Up => (ConsoleColor.Green, "   Up    "),
-            ElevatorDirection.Down => (ConsoleColor.Red, "  Down   "),
-            ElevatorDirection.Stationary => (ConsoleColor.Gray, "Stationary"),
-            _ => (ConsoleColor.White, " Unknown ")
+            ElevatorDirection.Up => (ConsoleColor.Green, "      Up     "),
+            ElevatorDirection.Down => (ConsoleColor.Red, "     Down    "),
+            ElevatorDirection.Stationary => (ConsoleColor.Gray, "  Stationary "),
+            _ => (ConsoleColor.White, "    Unknown    ")
         };
 
         Console.ForegroundColor = colour;
@@ -101,5 +104,41 @@ public class ConsoleRenderer : IConsoleRenderer
             Console.ResetColor();
             Console.WriteLine(message);
         }
+    }
+
+    public void RenderLogs(IReadOnlyList<string> logEntries)
+    {
+        Console.Clear();
+        Console.WriteLine("  ═══ Simulation Logs ═══");
+        Console.WriteLine();
+
+        if (logEntries.Count == 0)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine("  No log entries yet.");
+            Console.ResetColor();
+        }
+        else
+        {
+            foreach (var entry in logEntries)
+            {
+                RenderLogLine(entry);
+            }
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("  Press any key to return to the main menu...");
+    }
+
+    private void RenderLogLine(string entry)
+    {
+        var colour = entry.Contains("[ERR]") ? ConsoleColor.Red
+            : entry.Contains("[WRN]") ? ConsoleColor.Yellow
+            : entry.Contains("[INF]") ? ConsoleColor.White
+            : ConsoleColor.DarkGray;
+
+        Console.ForegroundColor = colour;
+        Console.WriteLine($"  {entry}");
+        Console.ResetColor();
     }
 }

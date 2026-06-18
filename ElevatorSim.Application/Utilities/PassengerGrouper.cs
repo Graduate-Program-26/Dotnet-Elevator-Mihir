@@ -1,8 +1,19 @@
+using ElevatorSim.Domain.Models;
+
+namespace ElevatorSim.Application.Utilities;
+
+/// <summary>
+/// A utilit class that groups passengers by destination floor proximity to optimize elevator assignments and minimize total trip cost.
+/// </summary>
 public static class PassengerGrouper
 {
-    public static List<List<Passenger>> Group(
-        IEnumerable<Passenger> passengers,
-        int groupCount)
+    /// <summary>
+    /// Groups passengers by destination floor proximity to optimize elevator assignments and minimize total trip cost.
+    /// </summary>
+    /// <param name="passengers">The list of passengers to group.</param>
+    /// <param name="groupCount">The number of groups to create</param>
+    /// <returns>A list of groups of passengers.</returns>
+    public static List<List<Passenger>> Group(IEnumerable<Passenger> passengers, int groupCount)
     {
         var sorted = passengers
             .OrderBy(p => p.DestinationFloor)

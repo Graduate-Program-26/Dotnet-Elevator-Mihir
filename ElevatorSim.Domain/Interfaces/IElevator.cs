@@ -1,3 +1,10 @@
+using ElevatorSim.Domain.Models;
+
+namespace ElevatorSim.Domain.Interfaces;
+
+/// <summary>
+/// Defines the interface for an elevator in the simulation.
+/// </summary>
 public interface IElevator
 {
     int CurrentFloor { get; }
