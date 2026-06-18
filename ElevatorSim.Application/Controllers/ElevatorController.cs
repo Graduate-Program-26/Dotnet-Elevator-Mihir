@@ -9,6 +9,9 @@ using Microsoft.Extensions.Logging;
 
 namespace ElevatorSim.Application.Controllers;
 
+/// <summary>
+/// The ElevatorController class manages elevator requests, dispatching, and passenger delivery.
+/// </summary>
 public class ElevatorController(
     IEnumerable<IElevator> elevators,
     IDispatchStrategy dispatchStrategy,
@@ -24,6 +27,10 @@ public class ElevatorController(
     public int PendingRequestCount => _pendingRequests.Count;
     public event Action<string>? OnElevatorMoved;
 
+    /// <summary>
+    /// Gets the current status of all elevators, including their current floor, direction, state, passenger count and capacity.
+    /// </summary>
+    /// <returns>The current statuses of all elevators.</returns>
     public IEnumerable<ElevatorStatus> GetStatuses()
     {
         return _elevators.Select((e, index) => new ElevatorStatus(
@@ -35,6 +42,15 @@ public class ElevatorController(
             e.Capacity));
     }
 
+    /// <summary>
+    /// Processes an elevator request for a specific floor and a list of passengers. Validates the request, determines which elevators to dispatch, and manages
+    /// the boarding and delivery of passengers to their destination floors. If no elevators are available, the request is queued until an elevator becomes available.
+    /// </summary>
+    /// <param name="floor">The floor where a passenger is requesting an elevator.</param>
+    /// <param name="passengers">The list of passengers requesting an elevator.</param>
+    /// <exception cref="InvalidFloorException">A custom exception that gets thrown when an invalid floor number is provided to the elevator.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">A custom exception that gets thrown when the number of passengers exceeds the elevator's capacity.</exception>
+    /// <exception cref="InvalidElevatorOperationException">A custom exception that gets thrown when an invalid operation is attempted on the elevator.</exception>
     public void RequestElevator(int floor, IEnumerable<Passenger> passengers)
     {
         if (floor < MinFloor || floor > MaxFloor)
