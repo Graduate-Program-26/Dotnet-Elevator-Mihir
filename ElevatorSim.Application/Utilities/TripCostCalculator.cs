@@ -3,8 +3,18 @@ using ElevatorSim.Domain.Models;
 
 namespace ElevatorSim.Application.Utilities;
 
+/// <summary>
+/// A utility class that calculated the estimated trip cost for an elevator.
+/// </summary>
 public static class TripCostCalculator
 {
+    /// <summary>
+    /// Calculates the estimated trip cost for an elevator to pick up a group of passengers from a starting floor and deliver them to their destination floors.
+    /// </summary>
+    /// <param name="elevator">The elevator for which to calculate the trip cost.</param>
+    /// <param name="startingFloor">The floor from which passengers are requesting an elevator.</param>
+    /// <param name="passengers">The list of passengers to assign to the elevator</param>
+    /// <returns>The estimated trip cost.</returns>
     public static double Calculate(IElevator elevator, int startingFloor, IEnumerable<Passenger> passengers)
     {
         var passengerList = passengers.ToList();
